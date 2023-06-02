@@ -1,1 +1,4 @@
-# 2023-05-otus-spring-amanov
+# Amanov Takhir 
+# Разработчик на Spring Framework
+
+1) StudentTestApp Приложение по проведению тестирования студентов
