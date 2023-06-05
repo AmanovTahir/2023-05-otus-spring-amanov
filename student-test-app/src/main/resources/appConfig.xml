@@ -8,7 +8,7 @@
         <constructor-arg index="0" value="questions.csv"/>
     </bean>
 
-    <bean id="printer" class="ru.otus.utils.ConsolePrinter"/>
+    <bean id="printer" class="ru.otus.utils.ConsolePrinterImpl"/>
 
     <bean id="questionDao" class="ru.otus.dao.QuestionDaoCsv">
 

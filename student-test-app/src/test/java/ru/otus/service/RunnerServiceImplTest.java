@@ -6,8 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.otus.domain.Question;
-import ru.otus.utils.ConsolePrinter;
+import ru.otus.dto.QuestionDto;
+import ru.otus.utils.ConsolePrinterImpl;
+
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class RunnerServiceImplTest {
@@ -15,7 +17,7 @@ class RunnerServiceImplTest {
     private QuestionService questionService;
 
     @Mock
-    private ConsolePrinter printer;
+    private ConsolePrinterImpl printer;
 
     private RunnerService service;
 
@@ -26,9 +28,9 @@ class RunnerServiceImplTest {
 
     @Test
     void printAnswers() {
-        Question question = new Question("question", "1", "2", "3", "result");
-        service.printAnswers();
+        QuestionDto questionDto = new QuestionDto("question", List.of("1", "2", "3"), 2);
+        service.printQuestions();
         Mockito.verify(questionService, Mockito.times(1)).getAllQuestion();
-        Mockito.verify(printer, Mockito.times(0)).printQuestion(question);
+        Mockito.verify(printer, Mockito.times(0)).print(questionDto.getQuestion(), questionDto.getAnswers());
     }
 }

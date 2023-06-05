@@ -8,13 +8,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.otus.dao.QuestionDao;
-import ru.otus.domain.Question;
+import ru.otus.dto.QuestionDto;
 
 import java.util.Collections;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-class QuestionServiceImplTest {
+class QuestionDtoServiceImplTest {
 
     @Mock
     private QuestionDao questionDao;
@@ -28,8 +28,8 @@ class QuestionServiceImplTest {
 
     @Test
     void shouldGetAllQuestions() {
-        Question question = new Question("question", "1", "2", "3", "result");
-        Mockito.when(questionDao.getAll()).thenReturn(List.of(question));
+        QuestionDto questionDto = new QuestionDto("question", List.of("1", "2", "3"), 2);
+        Mockito.when(questionDao.getAll()).thenReturn(List.of(questionDto));
         Assertions.assertNotNull(questionService.getAllQuestion());
     }
 

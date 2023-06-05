@@ -28,6 +28,7 @@ public class CsvParser<T> implements Parser<T> {
     }
 
     private CsvSchema getSchema(Class<T> clazz, CsvMapper mapper) {
-        return mapper.schemaFor(clazz).withColumnSeparator(';').withSkipFirstDataRow(true);
+        return mapper.schemaFor(clazz).withColumnSeparator(';')
+                .withSkipFirstDataRow(true).withArrayElementSeparator("%");
     }
 }

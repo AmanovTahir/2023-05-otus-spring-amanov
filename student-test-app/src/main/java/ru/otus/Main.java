@@ -8,6 +8,6 @@ public class Main {
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("appConfig.xml");
         RunnerService runnerService = context.getBean(RunnerServiceImpl.class);
-        runnerService.printAnswers();
+        runnerService.printQuestions();
     }
 }
