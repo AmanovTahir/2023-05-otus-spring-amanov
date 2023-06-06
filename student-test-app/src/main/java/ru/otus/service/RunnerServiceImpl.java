@@ -1,7 +1,7 @@
 package ru.otus.service;
 
 import lombok.RequiredArgsConstructor;
-import ru.otus.dto.QuestionDto;
+import ru.otus.converter.QuestionConverter;
 import ru.otus.utils.Printer;
 
 @RequiredArgsConstructor
@@ -11,10 +11,12 @@ public class RunnerServiceImpl implements RunnerService {
 
     private final Printer printer;
 
+    private final QuestionConverter converter;
+
     @Override
     public void printQuestions() {
-        for (QuestionDto questionDto : service.getAllQuestion()) {
-            printer.print(questionDto.getQuestion(), questionDto.getAnswers());
-        }
+        service.getAllQuestion().stream()
+                .map(converter::convertToString)
+                .forEach(printer::print);
     }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class CsvParser<T> implements Parser<T> {
+
     private final ClassPathResource resource;
 
     @Override

@@ -1,9 +1,10 @@
 package ru.otus.dao;
 
-import ru.otus.dto.QuestionDto;
+import ru.otus.domain.Question;
 
 import java.util.List;
 
 public interface QuestionDao {
-    List<QuestionDto> getAll();
+    List<Question> getAll();
+
 }
