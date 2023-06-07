@@ -36,8 +36,9 @@ class QuestionServiceImplTest {
             add(new Answer("bdc", false));
         }};
         Question question = new Question("question", answers);
-        Mockito.when(questionDao.getAll()).thenReturn(List.of(question));
-        Assertions.assertNotNull(questionService.getAllQuestion());
+        List<Question> questions = List.of(question);
+        Mockito.when(questionDao.getAll()).thenReturn(questions);
+        Assertions.assertEquals(questions, questionService.getAllQuestion());
     }
 
     @Test

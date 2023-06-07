@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 public class ConsolePrinterImpl implements Printer {
 
     @Override
-    public void print(Object o) {
-        System.out.println(o.toString());
+    public void print(String str) {
+        System.out.println(str);
     }
 }
