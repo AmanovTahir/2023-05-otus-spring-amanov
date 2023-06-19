@@ -1,11 +1,12 @@
 package ru.otus.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
-import ru.otus.converter.Converter;
+import ru.otus.domain.Answer;
 import ru.otus.domain.Question;
 import ru.otus.domain.Result;
-import ru.otus.utils.AnswerListUtil;
+import ru.otus.exception.AnswerIndexOutOfBoundsException;
 
 import java.util.List;
 
@@ -18,11 +19,7 @@ public class TestingServiceImpl implements TestingService {
 
     private final QuestionService questionService;
 
-    private final AnswerService answerService;
-
-    private final Converter<Question, String> questionConverter;
-
-    private final AnswerListUtil answerListUtil;
+    private final ConversionService conversionService;
 
     private static Result initResult(int size, long scores) {
         return Result.builder().total(size).pass(scores).build();
@@ -42,8 +39,20 @@ public class TestingServiceImpl implements TestingService {
     }
 
     private boolean isPass(Question question) {
-        int number = ioService.readIntWithPrompt(questionConverter.convert(question));
-        return answerListUtil.checkAnswerNumber(number, question.getAnswers().size()) &&
-                answerService.get(question, number).isCorrect();
+        String convert = conversionService.convert(question, String.class);
+        int number = ioService.readIntWithPrompt(convert);
+        return checkAnswerNumber(number, question.getAnswers().size())
+                && getAnswer(question, number).isCorrect();
+    }
+
+    private Answer getAnswer(Question question, int number) {
+        return question.getAnswers().get(number - 1);
+    }
+
+    private boolean checkAnswerNumber(int answerNumber, int AnswersCount) {
+        if (answerNumber <= 0 || answerNumber > AnswersCount) {
+            throw new AnswerIndexOutOfBoundsException("Given number of answer is out of range");
+        }
+        return true;
     }
 }

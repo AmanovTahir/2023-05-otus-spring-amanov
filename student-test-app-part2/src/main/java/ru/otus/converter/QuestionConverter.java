@@ -1,5 +1,6 @@
 package ru.otus.converter;
 
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import ru.otus.domain.Answer;
 import ru.otus.domain.Question;

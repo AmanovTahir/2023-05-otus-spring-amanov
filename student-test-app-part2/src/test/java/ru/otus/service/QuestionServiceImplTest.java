@@ -3,16 +3,8 @@ package ru.otus.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import org.springframework.core.io.Resource;
 import ru.otus.dao.Parser;
 import ru.otus.dao.ParserCsv;
 import ru.otus.dao.QuestionDao;
@@ -27,16 +19,18 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Сервис вопросов")
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 class QuestionServiceImplTest {
 
-    @Autowired
     private QuestionService questionService;
     private List<Question> expected;
 
     @BeforeEach
     void setUp() {
+        QuestionMapper mapper = new QuestionMapper();
+        Resource resource = new DefaultResourceLoader().getResource("/questionsTest.csv");
+        Parser<QuestionDto> parser = new ParserCsv<>(resource);
+        QuestionDao dao = new QuestionDaoCsv(parser, mapper);
+        questionService = new QuestionServiceImpl(dao);
         List<Answer> answers = List.of(
                 new Answer("a1", false),
                 new Answer("a2", true),
@@ -77,33 +71,5 @@ class QuestionServiceImplTest {
     void shouldGetAllQuestions() {
         List<Question> actual = questionService.getAllQuestion();
         assertEquals(expected, actual);
-    }
-
-    @Configuration
-    @PropertySource("classpath:appTest.properties")
-    public static class ContextConfiguration {
-
-        @Value("${questions}")
-        private String path;
-
-        @Bean
-        public QuestionService questionService() {
-            return new QuestionServiceImpl(questionDao());
-        }
-
-        @Bean
-        public QuestionDao questionDao() {
-            return new QuestionDaoCsv(parserScv(), questionMapper());
-        }
-
-        @Bean
-        public Parser<QuestionDto> parserScv() {
-            return new ParserCsv<>(new DefaultResourceLoader().getResource(path));
-        }
-
-        @Bean
-        public QuestionMapper questionMapper() {
-            return new QuestionMapper();
-        }
     }
 }

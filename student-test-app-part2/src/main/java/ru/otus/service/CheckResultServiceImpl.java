@@ -1,18 +1,13 @@
 package ru.otus.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 import ru.otus.domain.Result;
 
 
-@Service
-@PropertySource("classpath:app.properties")
+@RequiredArgsConstructor
 public class CheckResultServiceImpl implements CheckResultService {
 
-
-    @Value("${passingGrade}")
-    private int passingGrade;
+    private final int passingGrade;
 
     @Override
     public boolean check(Result result) {

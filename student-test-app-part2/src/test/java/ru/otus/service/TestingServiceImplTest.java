@@ -6,17 +6,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.otus.converter.Converter;
+import org.springframework.core.convert.ConversionService;
 import ru.otus.domain.Answer;
 import ru.otus.domain.Question;
 import ru.otus.domain.Result;
-import ru.otus.utils.AnswerListUtil;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Сервсис тестирования")
@@ -27,11 +27,7 @@ class TestingServiceImplTest {
     @Mock
     private QuestionService questionService;
     @Mock
-    private AnswerService answerService;
-    @Mock
-    private Converter<Question, String> questionConverter;
-    @Mock
-    private AnswerListUtil answerListUtil;
+    private ConversionService conversionService;
     @InjectMocks
     private TestingServiceImpl service;
 
@@ -40,9 +36,7 @@ class TestingServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        service = new TestingServiceImpl(ioService, questionService,
-                answerService, questionConverter, answerListUtil);
+        service = new TestingServiceImpl(ioService, questionService, conversionService);
         List<Answer> answers = List.of(
                 new Answer("a1", false),
                 new Answer("a2", true),
@@ -81,7 +75,10 @@ class TestingServiceImplTest {
     @Test
     @DisplayName("должен возвращать результат тестирования")
     void shouldReturnExpectedResult() {
+        String question = "any string";
         when(questionService.getAllQuestion()).thenReturn(questions);
+        when(conversionService.convert(any(Question.class), eq(String.class))).thenReturn(question);
+        when(ioService.readIntWithPrompt(question)).thenReturn(1);
         Result expected = Result.builder().pass(0).total(5).build();
         Result actual = service.testing();
         assertEquals(expected, actual);

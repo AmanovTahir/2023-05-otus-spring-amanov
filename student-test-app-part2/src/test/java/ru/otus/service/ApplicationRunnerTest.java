@@ -6,10 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.otus.converter.Converter;
-import ru.otus.domain.Messages;
+import org.springframework.core.convert.ConversionService;
 import ru.otus.domain.Result;
 import ru.otus.domain.User;
 
@@ -30,18 +28,18 @@ class ApplicationRunnerTest {
     private UserService userService;
 
     @Mock
-    private Converter<Result, String> resultConverter;
+    private CheckResultService checkService;
 
     @Mock
-    private CheckResultService checkService;
+    private ConversionService conversionService;
 
     @InjectMocks
     private ApplicationRunner applicationRunner;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        applicationRunner = new ApplicationRunner(testingService, ioService, userService, resultConverter, checkService);
+        applicationRunner = new ApplicationRunner(testingService, ioService, userService,
+                conversionService, checkService);
     }
 
     @Test
@@ -52,10 +50,10 @@ class ApplicationRunnerTest {
         Result result = Result.builder().pass(4).total(5).build();
         String expectedResult = "4/5";
 
-        when(ioService.readStringWithPrompt(Messages.HELLO.getMessage())).thenReturn(fullName);
+        when(ioService.readStringWithPrompt(anyString())).thenReturn(fullName);
         when(userService.getUser(fullName)).thenReturn(user);
         when(testingService.testing()).thenReturn(result);
-        when(resultConverter.convert(result)).thenReturn(expectedResult);
+        when(conversionService.convert(result, String.class)).thenReturn(expectedResult);
         when(checkService.check(result)).thenReturn(true);
 
         applicationRunner.run();
@@ -64,7 +62,7 @@ class ApplicationRunnerTest {
         verify(userService, times(1)).getUser(fullName);
         verify(testingService, times(1)).testing();
         verify(ioService, times(2)).outputString(anyString());
-        verify(resultConverter, times(1)).convert(result);
+        verify(conversionService, times(1)).convert(result, String.class);
         verify(checkService, times(1)).check(result);
         assertEquals(user.getResult(), result);
     }
