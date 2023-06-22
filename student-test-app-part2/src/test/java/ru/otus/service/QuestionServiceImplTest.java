@@ -21,15 +21,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DisplayName("Сервис вопросов")
 class QuestionServiceImplTest {
 
-    private QuestionService questionService;
     private List<Question> expected;
+    private Parser<QuestionDto> parser;
+    private QuestionDao dao;
+    private QuestionService questionService;
 
     @BeforeEach
     void setUp() {
         QuestionMapper mapper = new QuestionMapper();
         Resource resource = new DefaultResourceLoader().getResource("/questionsTest.csv");
-        Parser<QuestionDto> parser = new ParserCsv<>(resource);
-        QuestionDao dao = new QuestionDaoCsv(parser, mapper);
+        parser = new ParserCsv<>(resource);
+        dao = new QuestionDaoCsv(parser, mapper);
         questionService = new QuestionServiceImpl(dao);
         List<Answer> answers = List.of(
                 new Answer("a1", false),
@@ -70,6 +72,27 @@ class QuestionServiceImplTest {
     @DisplayName("должен возвращать список вопросов")
     void shouldGetAllQuestions() {
         List<Question> actual = questionService.getAllQuestion();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("должен возвращать список dto")
+    void shouldGetAllQuestionDto() {
+        List<QuestionDto> expected = List.of(
+                new QuestionDto("question1", 2, List.of("a1", "a2", "a3")),
+                new QuestionDto("question2", 2, List.of("a1", "a2", "a3")),
+                new QuestionDto("question3", 2, List.of("a1", "a2", "a3")),
+                new QuestionDto("question4", 3, List.of("a1", "a2", "a3")),
+                new QuestionDto("question5", 2, List.of("a1", "a2", "a3"))
+        );
+        List<QuestionDto> actual = parser.parse(QuestionDto.class);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("должен возвращать список")
+    void shouldGetAll() {
+        List<Question> actual = dao.getAll();
         assertEquals(expected, actual);
     }
 }

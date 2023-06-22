@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.otus.domain.Result;
 import ru.otus.domain.User;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class ApplicationRunner {
@@ -23,8 +25,6 @@ public class ApplicationRunner {
 
     private final IOService ioService;
 
-    private final UserService userService;
-
     private final ConversionService conversionService;
 
     private final CheckResultService checkService;
@@ -32,15 +32,15 @@ public class ApplicationRunner {
 
     public void run() {
         String fullName = ioService.readStringWithPrompt(HELLO);
-        User user = userService.getUser(fullName);
+        User user = Objects.requireNonNull(conversionService.convert(fullName, User.class));
         Result result = testingService.testing();
         printResult(user, result);
     }
 
     private void printResult(User user, Result result) {
         user.setResult(result);
-        String convert = conversionService.convert(user.getResult(), String.class);
-        ioService.outputString(YOUR_SCORE + convert);
+        String resultAsString = conversionService.convert(user.getResult(), String.class);
+        ioService.outputString(YOUR_SCORE + resultAsString);
         String resultMessage = checkService.check(result) ? WIN : LOOSE;
         ioService.outputString(resultMessage);
     }

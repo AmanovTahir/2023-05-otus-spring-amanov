@@ -13,17 +13,17 @@ import java.util.stream.Collectors;
 @Component
 public class QuestionMapper {
 
-    private static Answer initAnswer(QuestionDto record, int index, boolean correct) {
+    private static Answer initAnswer(QuestionDto dto, int index, boolean correct) {
         return Answer.builder()
-                .answer(record.getAnswers().get(index))
+                .answer(dto.getAnswers().get(index))
                 .correct(correct)
                 .build();
     }
 
-    public Question mapToQuestion(QuestionDto record) {
+    public Question mapToQuestion(QuestionDto dto) {
         return Question.builder()
-                .question(record.getQuestion())
-                .answers(getAnswersList(record))
+                .question(dto.getQuestion())
+                .answers(getAnswersList(dto))
                 .build();
     }
 
@@ -34,11 +34,11 @@ public class QuestionMapper {
                 .collect(Collectors.toList());
     }
 
-    private List<Answer> getAnswersList(QuestionDto record) {
+    private List<Answer> getAnswersList(QuestionDto dto) {
         List<Answer> answers = new ArrayList<>();
-        for (int i = 0; i < record.getAnswers().size(); i++) {
-            boolean correct = (record.getCorrectNumber() - 1) == i;
-            Answer answer = initAnswer(record, i, correct);
+        for (int i = 0; i < dto.getAnswers().size(); i++) {
+            boolean correct = (dto.getCorrectNumber() - 1) == i;
+            Answer answer = initAnswer(dto, i, correct);
             answers.add(answer);
         }
         return answers;

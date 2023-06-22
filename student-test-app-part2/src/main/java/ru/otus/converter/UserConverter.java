@@ -1,16 +1,15 @@
-package ru.otus.service;
+package ru.otus.converter;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 import ru.otus.domain.User;
 import ru.otus.exception.UsersNameException;
 
-@Service
-@RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+@Component
+public class UserConverter implements Converter<String, User> {
 
     @Override
-    public User getUser(String user) {
+    public User convert(String user) {
         if (!user.isEmpty() && user.split("\\s+").length == 2) {
             String[] split = user.strip().split("\\s+");
             return User.builder().name(split[0]).surname(split[1]).build();

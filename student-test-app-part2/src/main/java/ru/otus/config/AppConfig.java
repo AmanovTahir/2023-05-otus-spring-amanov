@@ -5,8 +5,9 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.ConversionServiceFactoryBean;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.DefaultResourceLoader;
 import ru.otus.dao.Parser;
 import ru.otus.dao.ParserCsv;
@@ -16,20 +17,15 @@ import ru.otus.service.CheckResultServiceImpl;
 import ru.otus.service.IOService;
 import ru.otus.service.IOServiceStreams;
 
+import java.util.Set;
+
 @Data
-@Import(ConversionServiceConfig.class)
 @Configuration
 @PropertySource("classpath:app.properties")
 public class AppConfig {
 
-    @Value("${questions}")
-    private String path;
-
-    @Value("${passingGrade}")
-    private int passingGrade;
-
     @Bean
-    public CheckResultService checkResultService() {
+    public CheckResultService checkResultService(@Value("${passingGrade}") int passingGrade) {
         return new CheckResultServiceImpl(passingGrade);
     }
 
@@ -39,7 +35,15 @@ public class AppConfig {
     }
 
     @Bean
-    public Parser<QuestionDto> parserScv() {
+    public Parser<QuestionDto> parserScv(@Value("${questions}") String path) {
         return new ParserCsv<>(new DefaultResourceLoader().getResource(path));
+    }
+
+    @Bean
+    public ConversionServiceFactoryBean conversionService(Set<Converter<?, ?>> converters) {
+        ConversionServiceFactoryBean bean = new ConversionServiceFactoryBean();
+        bean.afterPropertiesSet();
+        bean.setConverters(converters);
+        return bean;
     }
 }

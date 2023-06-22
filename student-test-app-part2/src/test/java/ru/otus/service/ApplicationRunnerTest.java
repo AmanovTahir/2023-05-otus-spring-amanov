@@ -25,9 +25,6 @@ class ApplicationRunnerTest {
     private IOService ioService;
 
     @Mock
-    private UserService userService;
-
-    @Mock
     private CheckResultService checkService;
 
     @Mock
@@ -38,8 +35,7 @@ class ApplicationRunnerTest {
 
     @BeforeEach
     void setUp() {
-        applicationRunner = new ApplicationRunner(testingService, ioService, userService,
-                conversionService, checkService);
+        applicationRunner = new ApplicationRunner(testingService, ioService, conversionService, checkService);
     }
 
     @Test
@@ -51,7 +47,7 @@ class ApplicationRunnerTest {
         String expectedResult = "4/5";
 
         when(ioService.readStringWithPrompt(anyString())).thenReturn(fullName);
-        when(userService.getUser(fullName)).thenReturn(user);
+        when(conversionService.convert(fullName, User.class)).thenReturn(user);
         when(testingService.testing()).thenReturn(result);
         when(conversionService.convert(result, String.class)).thenReturn(expectedResult);
         when(checkService.check(result)).thenReturn(true);
@@ -59,7 +55,6 @@ class ApplicationRunnerTest {
         applicationRunner.run();
 
         verify(ioService, times(1)).readStringWithPrompt(anyString());
-        verify(userService, times(1)).getUser(fullName);
         verify(testingService, times(1)).testing();
         verify(ioService, times(2)).outputString(anyString());
         verify(conversionService, times(1)).convert(result, String.class);
