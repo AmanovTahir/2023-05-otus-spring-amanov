@@ -34,12 +34,12 @@ public class ApplicationRunner {
         String fullName = ioService.readStringWithPrompt(HELLO);
         User user = Objects.requireNonNull(conversionService.convert(fullName, User.class));
         Result result = testingService.testing();
-        printResult(user, result);
+        result.setUser(user);
+        printResult(result);
     }
 
-    private void printResult(User user, Result result) {
-        user.setResult(result);
-        String resultAsString = conversionService.convert(user.getResult(), String.class);
+    private void printResult(Result result) {
+        String resultAsString = conversionService.convert(result, String.class);
         ioService.outputString(YOUR_SCORE + resultAsString);
         String resultMessage = checkService.check(result) ? WIN : LOOSE;
         ioService.outputString(resultMessage);

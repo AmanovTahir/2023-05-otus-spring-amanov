@@ -3,8 +3,9 @@ package ru.otus.dao;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -12,10 +13,14 @@ import java.util.List;
 import java.util.Objects;
 
 
-@RequiredArgsConstructor
+@Component
 public class ParserCsv<T> implements Parser<T> {
 
     private final Resource resource;
+
+    public ParserCsv(@Value("${questions}") Resource resource) {
+        this.resource = resource;
+    }
 
     @Override
     public List<T> parse(Class<T> clazz) {

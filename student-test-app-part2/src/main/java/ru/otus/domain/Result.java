@@ -14,4 +14,6 @@ public class Result {
     private long pass;
 
     private int total;
+
+    private User user;
 }

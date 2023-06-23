@@ -43,7 +43,7 @@ class ApplicationRunnerTest {
     void shouldPrintResult() {
         String fullName = "John Smith";
         User user = User.builder().name("John").surname("Smith").build();
-        Result result = Result.builder().pass(4).total(5).build();
+        Result result = Result.builder().pass(4).total(5).user(user).build();
         String expectedResult = "4/5";
 
         when(ioService.readStringWithPrompt(anyString())).thenReturn(fullName);
@@ -59,6 +59,6 @@ class ApplicationRunnerTest {
         verify(ioService, times(2)).outputString(anyString());
         verify(conversionService, times(1)).convert(result, String.class);
         verify(checkService, times(1)).check(result);
-        assertEquals(user.getResult(), result);
+        assertEquals(result.getUser(), user);
     }
 }
