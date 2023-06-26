@@ -36,7 +36,6 @@ class TestingServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new TestingServiceImpl(ioService, questionService, conversionService);
         List<Answer> answers = List.of(
                 new Answer("a1", false),
                 new Answer("a2", true),

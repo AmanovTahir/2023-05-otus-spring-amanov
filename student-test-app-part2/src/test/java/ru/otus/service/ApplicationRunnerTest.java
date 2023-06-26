@@ -1,6 +1,5 @@
 package ru.otus.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,11 +31,6 @@ class ApplicationRunnerTest {
 
     @InjectMocks
     private ApplicationRunner applicationRunner;
-
-    @BeforeEach
-    void setUp() {
-        applicationRunner = new ApplicationRunner(testingService, ioService, conversionService, checkService);
-    }
 
     @Test
     @DisplayName("должен распечатать результат")
