@@ -1,0 +1,8 @@
+spring:
+  messages:
+    basename: messages
+    encoding: UTF-8
+
+passingGrade: 4
+questions: questions_${locale}.csv
+locale: ru_RU
