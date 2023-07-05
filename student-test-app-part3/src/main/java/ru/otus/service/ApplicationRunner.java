@@ -13,7 +13,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ApplicationRunner implements CommandLineRunner {
 
-    private final MessageSourceService messageService;
+    private final MessageService messageService;
 
     private final TestingService testingService;
 
@@ -34,7 +34,7 @@ public class ApplicationRunner implements CommandLineRunner {
 
     private void printResult(Result result) {
         String resultAsString = conversionService.convert(result, String.class);
-        ioService.outputString(messageService.getMessage("score", new String[]{resultAsString}));
+        ioService.outputString(messageService.getMessage("score", resultAsString));
         String resultMessage = checkService.check(result)
                 ? messageService.getMessage("win")
                 : messageService.getMessage("loose");

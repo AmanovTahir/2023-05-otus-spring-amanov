@@ -21,7 +21,7 @@ class ApplicationRunnerTest {
     private TestingService testingService;
 
     @Mock
-    private MessageSourceService messageService;
+    private MessageService messageService;
 
     @Mock
     private IOService ioService;
