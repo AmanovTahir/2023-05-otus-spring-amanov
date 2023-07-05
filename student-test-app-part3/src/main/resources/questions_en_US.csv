@@ -1,0 +1,6 @@
+question;correct;answers;
+Can we compare int variable with a boolean variable?;2;true%false%int is not in java
+Can we have two public classes in one java file?;2;true%false%One class cannot have another
+What is polymorphism?;2;Polymorphism is a technique to define different objects of same type%Polymorphism is the ability of an object to take on many forms%None of the above
+What is static block?;3;It is used to create synchronized code%There is no such block%It is used to initialize the static data member. It is executed before main method at the time of class loading
+Inheritance represents;2;HAS-A relationship%IS-A relationship%is it really java?
