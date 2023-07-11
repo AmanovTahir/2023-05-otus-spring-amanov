@@ -9,13 +9,13 @@ import ru.otus.domain.User;
 @Component
 @Scope("prototype")
 @NoArgsConstructor
-public class AuthorisationProcessor {
-    private boolean isAuthorisation;
+public class AuthorizationProcessor {
+    private boolean isAuthorized;
 
     private User user;
 
-    public boolean isAuthorisation() {
-        return isAuthorisation;
+    public boolean isAuthorized() {
+        return isAuthorized;
     }
 
     public User getUser() {
@@ -24,6 +24,6 @@ public class AuthorisationProcessor {
 
     public void setUser(User user) {
         this.user = user;
-        this.isAuthorisation = true;
+        this.isAuthorized = true;
     }
 }

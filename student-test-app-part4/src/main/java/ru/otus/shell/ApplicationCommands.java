@@ -8,7 +8,7 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellMethodAvailability;
 import ru.otus.domain.Result;
 import ru.otus.domain.User;
-import ru.otus.service.AuthorisationProcessor;
+import ru.otus.service.AuthorizationProcessor;
 import ru.otus.service.CheckResultService;
 import ru.otus.service.MessageService;
 import ru.otus.service.TestingService;
@@ -25,7 +25,7 @@ public class ApplicationCommands {
 
     private final MessageService messageService;
 
-    private final AuthorisationProcessor authorisation;
+    private final AuthorizationProcessor authorisation;
 
     private final CheckResultService checkService;
 
@@ -54,7 +54,7 @@ public class ApplicationCommands {
     }
 
     private Availability isTestCommandAvailable() {
-        return authorisation.isAuthorisation()
+        return authorisation.isAuthorized()
                 ? Availability.available()
                 : Availability.unavailable(messageService.getMessage("error"));
     }

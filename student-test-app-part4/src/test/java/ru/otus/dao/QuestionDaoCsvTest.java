@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 @DisplayName("DAO вопросов")
 @ComponentScan({"ru.otus.dao", "ru.otus.mapper"})
-@SpringBootTest
+@SpringBootTest(properties = "spring.=")
 class QuestionDaoCsvTest {
 
     @Autowired
