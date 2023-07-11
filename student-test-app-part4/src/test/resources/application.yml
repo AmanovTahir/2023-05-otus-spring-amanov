@@ -1,0 +1,9 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  shell:
+    interactive:
+      enabled: false
+questions: questionsTest.csv
+passingGrade: 4
+locale: ru_RU
