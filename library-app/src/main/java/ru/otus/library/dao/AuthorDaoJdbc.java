@@ -45,8 +45,9 @@ public class AuthorDaoJdbc implements AuthorDao {
     @Override
     public Optional<Author> update(Author author) {
         String sql = """
-                UPDATE authors SET author_id=:author_id,
-                first_name=:first_name, last_name=:last_name where author_id = :author_id""";
+                UPDATE authors
+                SET first_name=:first_name, last_name=:last_name
+                WHERE author_id = :author_id""";
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("author_id", author.getId())
                 .addValue("first_name", author.getFirstName())
@@ -58,7 +59,10 @@ public class AuthorDaoJdbc implements AuthorDao {
     @Override
     public Optional<Author> getById(long id) {
         try {
-            String sql = "SELECT * FROM authors WHERE author_id = :author_id";
+            String sql = """ 
+                    SELECT author_id, first_name, last_name
+                    FROM authors
+                    WHERE author_id = :author_id""";
             SqlParameterSource params = new MapSqlParameterSource().addValue("author_id", id);
             return Optional.ofNullable(jdbc.queryForObject(sql, params, new AuthorMapper()));
         } catch (DataAccessException e) {
@@ -68,18 +72,14 @@ public class AuthorDaoJdbc implements AuthorDao {
 
     @Override
     public List<Author> getAll() {
-        String sql = "SELECT * FROM authors";
+        String sql = """
+                SELECT author_id, first_name, last_name
+                FROM authors""";
         return jdbc.query(sql, new AuthorMapper());
     }
 
     @Override
     public void deleteById(long id) {
-        String setNullAuthorSql =
-                "UPDATE books SET author_id = NULL WHERE author_id = :author_id";
-        SqlParameterSource paramsForBook = new MapSqlParameterSource()
-                .addValue("author_id", id);
-        jdbc.update(setNullAuthorSql, paramsForBook);
-
         String deleteAuthorSql =
                 "DELETE FROM authors WHERE author_id = :author_id";
         SqlParameterSource paramsForAuthor = new MapSqlParameterSource()

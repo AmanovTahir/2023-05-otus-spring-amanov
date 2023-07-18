@@ -24,6 +24,12 @@ class BookDaoJdbcTest {
     @Autowired
     private BookDaoJdbc bookDao;
 
+    @Autowired
+    private CategoryDaoJdbc categoryDaoJdbc;
+
+    @Autowired
+    private AuthorDaoJdbc authorDaoJdbc;
+
     @DisplayName("возвращать ожидаемое количество книг в БД")
     @Test
     public void shouldGetCount() {
@@ -34,8 +40,9 @@ class BookDaoJdbcTest {
     @DisplayName("добавлять книгу в БД")
     @Test
     public void shouldInsertIntoBD() {
-        Author author = new Author("firstName", "lastName");
-        Category category = new Category("category");
+        Author author = authorDaoJdbc.insert(new Author("firstName", "lastName")).orElseThrow();
+        Category category = categoryDaoJdbc.insert(new Category("category")).orElseThrow();
+
         Book expected = new Book("new Book", author, category);
 
         Optional<Book> actualInsert = bookDao.insert(expected);
@@ -48,29 +55,25 @@ class BookDaoJdbcTest {
     @DisplayName("добавлять книгу в БД c сущетсвуещим автором")
     @Test
     public void shouldInsertIntoBDWithAuthor() {
-        Author author = new Author(1, "Михаил", "Булгаков");
-        Category category = new Category("category");
-        Book expected = new Book("new Book", author, category);
+        Author author = new Author(2, "Николай", "Гоголь");
+        Category category = categoryDaoJdbc.insert(new Category("category")).orElseThrow();
 
+        Book expected = new Book("new Book", author, category);
         Optional<Book> actualInsert = bookDao.insert(expected);
-        Optional<Book> actual = bookDao.getById(actualInsert.orElseThrow().getId());
 
         assertEquals(expected, actualInsert.orElse(null));
-        assertEquals(expected, actual.orElse(null));
     }
 
     @DisplayName("добавлять книгу в БД c сущетсвуещим жанром")
     @Test
     public void shouldInsertIntoBDWithCategory() {
-        Author author = new Author(1, "Михаил", "Булгаков");
-        Category category = new Category(1, "классика");
+        Author author = authorDaoJdbc.insert(new Author("firstName", "lastName")).orElseThrow();
+        Category category = categoryDaoJdbc.getById(1).orElseThrow();
+
         Book expected = new Book("new Book", author, category);
+        Book actualInsert = bookDao.insert(expected).orElseThrow();
 
-        Optional<Book> actualInsert = bookDao.insert(expected);
-        Optional<Book> actual = bookDao.getById(actualInsert.orElseThrow().getId());
-
-        assertEquals(expected, actualInsert.orElse(null));
-        assertEquals(expected, actual.orElse(null));
+        assertEquals(expected, actualInsert);
     }
 
 

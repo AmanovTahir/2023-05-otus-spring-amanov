@@ -2,9 +2,9 @@ package ru.otus.library.services;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.otus.library.dao.BookDao;
 import ru.otus.library.domain.Author;
 import ru.otus.library.domain.Book;
@@ -18,15 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 
-@SpringBootTest
+@SpringBootTest(classes = BookServiceImpl.class)
 @DisplayName("Service для книг должен")
 class BookServiceImplTest {
 
-    @Mock
+    @MockBean
     private BookDao bookDao;
 
-    @InjectMocks
-    private BookServiceImpl bookService;
+    @Autowired
+    private BookService bookService;
 
     @Test
     @DisplayName("удалить по id")

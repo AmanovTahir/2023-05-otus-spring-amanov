@@ -17,6 +17,6 @@ CREATE TABLE books
     author_id   BIGINT,
     category_id BIGINT,
     title       VARCHAR(250) NOT NULL,
-    FOREIGN KEY (author_id) REFERENCES authors (author_id) ON DELETE NO ACTION,
-    FOREIGN KEY (category_id) REFERENCES categories (category_id) ON DELETE NO ACTION
+    FOREIGN KEY (author_id) REFERENCES authors (author_id) ON DELETE SET NULL,
+    FOREIGN KEY (category_id) REFERENCES categories (category_id) ON DELETE SET NULL
 );

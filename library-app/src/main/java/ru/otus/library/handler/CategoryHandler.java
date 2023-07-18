@@ -2,7 +2,7 @@ package ru.otus.library.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.otus.library.domain.Category;
 import ru.otus.library.services.CategoryService;
 import ru.otus.library.services.IOService.IOService;
@@ -10,7 +10,7 @@ import ru.otus.library.services.IOService.IOService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class CategoryHandler {
 

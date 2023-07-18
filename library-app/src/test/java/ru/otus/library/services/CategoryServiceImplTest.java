@@ -2,9 +2,9 @@ package ru.otus.library.services;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.otus.library.dao.CategoryDao;
 import ru.otus.library.domain.Category;
 
@@ -15,15 +15,15 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(classes = {CategoryServiceImpl.class})
 @DisplayName("Service для жанров должен")
 class CategoryServiceImplTest {
 
-    @Mock
+    @MockBean
     private CategoryDao categoryDao;
 
-    @InjectMocks
-    private CategoryServiceImpl categoryService;
+    @Autowired
+    private CategoryService categoryService;
 
     @Test
     @DisplayName("удалить по id")

@@ -2,7 +2,7 @@ package ru.otus.library.handler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.otus.library.domain.Author;
 import ru.otus.library.services.AuthorService;
 import ru.otus.library.services.IOService.IOService;
@@ -10,7 +10,7 @@ import ru.otus.library.services.IOService.IOService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class AuthorHandler {
 
@@ -22,9 +22,9 @@ public class AuthorHandler {
 
 
     public String deleteById(long id) {
-        Author category = authorService.getById(id);
+        Author author = authorService.getById(id);
         authorService.deleteById(id);
-        String convert = conversionService.convert(category, String.class);
+        String convert = conversionService.convert(author, String.class);
         return String.format("Автор – %s удален!", convert);
     }
 

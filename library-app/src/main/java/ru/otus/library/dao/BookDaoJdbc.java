@@ -24,10 +24,6 @@ public class BookDaoJdbc implements BookDao {
 
     private final NamedParameterJdbcOperations jdbc;
 
-    private final AuthorDao authorDaoJdbc;
-
-    private final CategoryDao categoryDaoJdbc;
-
     @Override
     public int count() {
         String sql = "SELECT COUNT(*) FROM books";
@@ -36,42 +32,21 @@ public class BookDaoJdbc implements BookDao {
 
     @Override
     public Optional<Book> insert(Book book) {
-        Author author = getAuthor(book.getAuthor());
-        Category category = getCategory(book.getCategory());
-        insertBook(book, author, category);
-        return Optional.of(book);
-    }
-
-    private Author getAuthor(Author author) {
-        Optional<Author> authorById = authorDaoJdbc.getById(author.getId());
-        return authorById.orElseGet(() -> {
-            authorDaoJdbc.insert(author);
-            return author;
-        });
-    }
-
-    private Category getCategory(Category category) {
-        Optional<Category> categoryById = categoryDaoJdbc.getById(category.getId());
-        return categoryById.orElseGet(() -> {
-            categoryDaoJdbc.insert(category);
-            return category;
-        });
-    }
-
-    private void insertBook(Book book, Author author, Category category) {
         String sql = """
                 INSERT INTO books (author_id, category_id, title)
                 VALUES (:author_id, :category_id, :title)""";
         SqlParameterSource params = new MapSqlParameterSource()
-                .addValue("author_id", author.getId())
-                .addValue("category_id", category.getId())
+                .addValue("author_id", book.getAuthor().getId())
+                .addValue("category_id", book.getCategory().getId())
                 .addValue("title", book.getTitle());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(sql, params, keyHolder, new String[]{"book_id"});
         Number key = Objects.requireNonNull(keyHolder.getKey()).longValue();
         book.setId(key.longValue());
+        return Optional.of(book);
     }
+
 
     @Override
     public Optional<Book> update(Book book) {

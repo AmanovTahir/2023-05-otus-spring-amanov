@@ -59,7 +59,7 @@ public class CategoryDaoJdbc implements CategoryDao {
     @Override
     public Optional<Category> getById(long id) {
         try {
-            String sql = "SELECT * FROM categories WHERE category_id = :category_id";
+            String sql = "SELECT category_id, name FROM categories WHERE category_id = :category_id";
             SqlParameterSource params = new MapSqlParameterSource()
                     .addValue("category_id", id);
             return Optional.ofNullable(jdbc.queryForObject(sql, params, new CategoryMapper()));
