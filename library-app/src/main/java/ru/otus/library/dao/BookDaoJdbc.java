@@ -51,7 +51,7 @@ public class BookDaoJdbc implements BookDao {
     @Override
     public Optional<Book> update(Book book) {
         String sql = """
-                UPDATE books SET book_id=:book_id,
+                UPDATE books SET
                 author_id=:author_id,
                 category_id=:category_id, title=:title where book_id = :book_id""";
         SqlParameterSource params = new MapSqlParameterSource()

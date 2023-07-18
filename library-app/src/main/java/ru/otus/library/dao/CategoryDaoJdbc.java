@@ -47,8 +47,7 @@ public class CategoryDaoJdbc implements CategoryDao {
     public Optional<Category> update(Category category) {
         String sql = """
                 UPDATE categories
-                SET category_id=:category_id,
-                name=:name where category_id = :category_id""";
+                SET name=:name where category_id = :category_id""";
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("category_id", category.getId())
                 .addValue("name", category.getName());
@@ -70,18 +69,12 @@ public class CategoryDaoJdbc implements CategoryDao {
 
     @Override
     public List<Category> getAll() {
-        String sql = "SELECT * FROM categories";
+        String sql = "SELECT category_id, name FROM categories";
         return jdbc.query(sql, new CategoryMapper());
     }
 
     @Override
     public void deleteById(long id) {
-        String setNullCategorySql =
-                "UPDATE books SET category_id = NULL WHERE category_id = :category_id";
-        SqlParameterSource paramsForBook = new MapSqlParameterSource()
-                .addValue("category_id", id);
-        jdbc.update(setNullCategorySql, paramsForBook);
-
         String deleteCategorySql =
                 "DELETE FROM categories WHERE category_id = :category_id";
         SqlParameterSource paramsForCategory = new MapSqlParameterSource()

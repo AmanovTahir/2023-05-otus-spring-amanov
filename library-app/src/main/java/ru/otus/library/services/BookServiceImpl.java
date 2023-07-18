@@ -23,7 +23,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-
     public List<Book> getAll() {
         return bookDao.getAll();
     }
