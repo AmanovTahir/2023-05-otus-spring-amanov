@@ -33,8 +33,7 @@ public class CommentRepositoryJpa implements CommentRepository {
 
     @Override
     public List<Comment> findAllByBookId(long bookId) {
-        return entityManager.createQuery("SELECT c FROM Comment c JOIN FETCH c.book WHERE c.book.id = :bookId",
-                        Comment.class)
+        return entityManager.createQuery("SELECT c FROM Comment c WHERE c.book.id = :bookId", Comment.class)
                 .setParameter("bookId", bookId)
                 .getResultList();
     }

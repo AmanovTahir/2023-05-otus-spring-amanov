@@ -2,6 +2,7 @@ package ru.otus.library.repositories;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 import ru.otus.library.domain.Book;
 
@@ -29,12 +30,19 @@ public class BookRepositoryJpa implements BookRepository {
     @Override
     public Optional<Book> findById(long id) {
         Book book = entityManager.find(Book.class, id);
-        return Optional.ofNullable(book);
+        Hibernate.initialize(book.getCategories());
+        Hibernate.initialize(book.getAuthors());
+        return Optional.of(book);
     }
 
     @Override
     public List<Book> findAll() {
-        return entityManager.createQuery("SELECT b FROM Book b", Book.class).getResultList();
+        List<Book> books = entityManager.createQuery("SELECT b FROM Book b", Book.class).getResultList();
+        books.forEach(book -> {
+            Hibernate.initialize(book.getCategories());
+            Hibernate.initialize(book.getAuthors());
+        });
+        return books;
     }
 
     @Override
