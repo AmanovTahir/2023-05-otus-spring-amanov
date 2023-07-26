@@ -24,22 +24,14 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional(readOnly = true)
     public List<Book> getAll() {
-        List<Book> books = bookRepository.findAll();
-        books.forEach(book -> {
-            Hibernate.initialize(book.getCategories());
-            Hibernate.initialize(book.getAuthors());
-        });
-        return books;
+        return bookRepository.findAll();
 
     }
 
     @Override
     @Transactional(readOnly = true)
     public Book getById(long id) {
-        Book book = bookRepository.findById(id).orElseThrow();
-        Hibernate.initialize(book.getCategories());
-        Hibernate.initialize(book.getAuthors());
-        return book;
+        return bookRepository.findById(id).orElseThrow();
     }
 
     @Override

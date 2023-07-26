@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthorHandler {
 
+    public static final String ENTER_AUTHOR_NAME = "Введите имя автора: ";
+
+    public static final String ENTER_AUTHORS_LAST_NAME = "Введите фамилию автора: ";
+
     private final ConversionService conversionService;
 
     private final IOService ioService;
@@ -35,8 +39,8 @@ public class AuthorHandler {
 
     public String update(long id) {
         Author author = authorService.getById(id);
-        author.setFirstName(ioService.readStringWithPrompt("Введите имя автора: "));
-        author.setLastName(ioService.readStringWithPrompt("Введите фамилию автора: "));
+        author.setFirstName(ioService.readStringWithPrompt(ENTER_AUTHOR_NAME));
+        author.setLastName(ioService.readStringWithPrompt(ENTER_AUTHORS_LAST_NAME));
         Author update = authorService.update(author);
         String convert = conversionService.convert(update, String.class);
         return String.format("Автор – %s изменен!", convert);
@@ -47,8 +51,8 @@ public class AuthorHandler {
         int choice = ioService.readIntWithPrompt("Выберите автора (0 для добавления нового): ");
         if (choice == 0) {
             Author author = Author.builder()
-                    .firstName(ioService.readStringWithPrompt("Введите имя автора: "))
-                    .lastName(ioService.readStringWithPrompt("Введите фамилию автора: "))
+                    .firstName(ioService.readStringWithPrompt(ENTER_AUTHOR_NAME))
+                    .lastName(ioService.readStringWithPrompt(ENTER_AUTHORS_LAST_NAME))
                     .build();
             return authorService.insert(author);
         }
