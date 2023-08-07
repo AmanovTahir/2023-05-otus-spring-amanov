@@ -1,26 +1,28 @@
 package ru.otus.library.repositories;
 
+import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.annotation.DirtiesContext;
-import ru.otus.library.domain.Book;
+import org.springframework.context.annotation.Import;
 import ru.otus.library.domain.Category;
+import ru.otus.library.events.MongoCategoryCascadeDeleteEventsListener;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Репозиторий для работы с жанрами должно")
 @DataMongoTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Import(MongoCategoryCascadeDeleteEventsListener.class)
 class CategoryRepositoryJpaTest {
 
 
     @Autowired
-    private CategoryRepository repository;
+    private CategoryRepository categoryRepository;
 
     @Autowired
     private BookRepository bookRepository;
@@ -30,21 +32,22 @@ class CategoryRepositoryJpaTest {
     @Test
     public void shouldInsertIntoBD() {
         Category expected = new Category("new category");
-        Category actual = repository.save(expected);
-
+        Category actual = categoryRepository.save(expected);
         assertEquals(expected, actual);
+
+        categoryRepository.delete(expected);
     }
 
     @DisplayName("обновить жанр в БД")
     @Test
     public void shouldUpdateIntoBD() {
-        List<Category> all = repository.findAll();
-        Category category = repository.findById(all.get(0).getId()).orElseThrow();
+        List<Category> all = categoryRepository.findAll();
+        Category category = categoryRepository.findById(all.get(0).getId()).orElseThrow();
         category.setName("update category");
 
-        Category expected = repository.save(category);
+        Category expected = categoryRepository.save(category);
 
-        Category actual = repository.findById(expected.getId()).orElseThrow();
+        Category actual = categoryRepository.findById(expected.getId()).orElseThrow();
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
@@ -53,9 +56,9 @@ class CategoryRepositoryJpaTest {
     @DisplayName("возвращать ожидаемый жанр по id")
     @Test
     public void shouldGetById() {
-        List<Category> all = repository.findAll();
+        List<Category> all = categoryRepository.findAll();
         Category expected = all.get(0);
-        Category actual = repository.findById(expected.getId()).orElseThrow();
+        Category actual = categoryRepository.findById(expected.getId()).orElseThrow();
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
@@ -65,22 +68,21 @@ class CategoryRepositoryJpaTest {
     @DisplayName("возвращать ожидаемый список жанров")
     @Test
     public void shouldGetAll() {
-        int actual = repository.findAll().size();
+        int actual = categoryRepository.findAll().size();
         assertEquals(5, actual);
     }
 
     @DisplayName("удалять жанр по id")
     @Test
     public void shouldDeleteById() {
-        List<Category> all = repository.findAll();
-        Category expected = repository.findById(all.get(0).getId()).orElseThrow();
-        repository.deleteById(expected.getId());
-        Book book = bookRepository.findByCategoriesContains(expected).orElseThrow();
+        val all = categoryRepository.findAll();
+        val expected = categoryRepository.findById(all.get(0).getId()).orElseThrow();
+        val categoryId = expected.getId();
+        categoryRepository.deleteById(expected.getId());
 
-        boolean contains = book.getCategories().contains(expected);
-
-        assertFalse(contains);
         assertThrows(NoSuchElementException.class,
-                () -> repository.findById(expected.getId()).orElseThrow());
+                () -> categoryRepository.findById(categoryId).orElseThrow());
+        assertThrows(NoSuchElementException.class,
+                () -> bookRepository.findByCategoriesId(categoryId).orElseThrow());
     }
 }

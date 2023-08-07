@@ -8,27 +8,23 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import ru.otus.library.domain.Book;
-import ru.otus.library.domain.Comment;
-
-import java.util.List;
-
 
 @Repository
 @RequiredArgsConstructor
-public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
-
+public class BookRepositoryCustomImpl implements BookRepositoryCustom {
     private final MongoTemplate mongoTemplate;
 
     @Override
-    public List<Comment> findAllByBookId(String bookId) {
-        Query query = new Query(Criteria.where("book.id").is(bookId));
-        return mongoTemplate.find(query, Comment.class);
+    public void removeAuthorsArrayElementsById(String id) {
+        Query query = Query.query(Criteria.where("$id").is(new ObjectId(id)));
+        Update update = new Update().pull("author", query);
+        mongoTemplate.updateMulti(new Query(), update, Book.class);
     }
 
     @Override
-    public void removeBookById(String id) {
+    public void removeCategoriesArrayElementsById(String id) {
         Query query = Query.query(Criteria.where("$id").is(new ObjectId(id)));
-        Update update = new Update().pull("book", query);
+        Update update = new Update().pull("category", query);
         mongoTemplate.updateMulti(new Query(), update, Book.class);
     }
 }

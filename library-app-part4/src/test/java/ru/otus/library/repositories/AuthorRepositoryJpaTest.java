@@ -1,23 +1,27 @@
 package ru.otus.library.repositories;
 
+import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Import;
 import ru.otus.library.domain.Author;
-import ru.otus.library.domain.Book;
+import ru.otus.library.events.MongoAuthorCascadeDeleteEventsListener;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Репозиторий для работы с авторами должно")
 @DataMongoTest
+@Import(MongoAuthorCascadeDeleteEventsListener.class)
 class AuthorRepositoryJpaTest {
 
     @Autowired
-    private AuthorRepository repository;
+    private AuthorRepository authorRepository;
 
     @Autowired
     private BookRepository bookRepository;
@@ -27,21 +31,22 @@ class AuthorRepositoryJpaTest {
     @Test
     public void shouldInsertIntoBD() {
         Author expected = new Author("firstname3", "lastname3");
-        Author actual = repository.save(expected);
-
+        Author actual = authorRepository.save(expected);
         assertEquals(expected, actual);
+
+        authorRepository.delete(expected);
     }
 
     @DisplayName("обновить автора в БД")
     @Test
     public void shouldUpdateIntoBD() {
-        List<Author> all = repository.findAll();
-        Author author = repository.findById(all.get(0).getId()).orElseThrow();
+        List<Author> all = authorRepository.findAll();
+        Author author = authorRepository.findById(all.get(0).getId()).orElseThrow();
         author.setFirstName("NewAuthorName");
 
-        Author expected = repository.save(author);
+        Author expected = authorRepository.save(author);
 
-        Author actual = repository.findById(expected.getId()).orElseThrow();
+        Author actual = authorRepository.findById(expected.getId()).orElseThrow();
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getFirstName(), actual.getFirstName());
@@ -51,9 +56,9 @@ class AuthorRepositoryJpaTest {
     @DisplayName("возвращать ожидаемого автора по id")
     @Test
     public void shouldGetById() {
-        List<Author> all = repository.findAll();
+        List<Author> all = authorRepository.findAll();
         Author expected = all.get(0);
-        Author actual = repository.findById(expected.getId()).orElseThrow();
+        Author actual = authorRepository.findById(expected.getId()).orElseThrow();
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getFirstName(), actual.getFirstName());
@@ -64,22 +69,21 @@ class AuthorRepositoryJpaTest {
     @DisplayName("возвращать ожидаемый список авторов")
     @Test
     public void shouldGetAll() {
-        int actual = repository.findAll().size();
+        int actual = authorRepository.findAll().size();
         assertEquals(5, actual);
     }
 
     @DisplayName("удалять автора по id")
     @Test
     public void shouldDeleteById() {
-        List<Author> all = repository.findAll();
-        Author expected = repository.findById(all.get(0).getId()).orElseThrow();
-        repository.deleteById(expected.getId());
-        Book book = bookRepository.findByAuthorsContains(expected).orElseThrow();
+        val all = authorRepository.findAll();
+        val expected = authorRepository.findById(all.get(0).getId()).orElseThrow();
+        val authorId = expected.getId();
+        authorRepository.deleteById(expected.getId());
 
-        boolean contains = book.getAuthors().contains(expected);
-
-        assertFalse(contains);
         assertThrows(NoSuchElementException.class,
-                () -> repository.findById(expected.getId()).orElseThrow());
+                () -> authorRepository.findById(authorId).orElseThrow());
+        assertThrows(NoSuchElementException.class,
+                () -> bookRepository.findByAuthorsId(authorId).orElseThrow());
     }
 }

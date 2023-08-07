@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.otus.library.domain.Author;
 import ru.otus.library.domain.Book;
 import ru.otus.library.domain.Category;
@@ -17,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Репозиторий для работы с книгами должно")
 @DataMongoTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class BookRepositoryJpaTest {
 
     @Autowired
@@ -35,12 +33,11 @@ class BookRepositoryJpaTest {
     public void shouldInsertIntoBD() {
         Author author = authorRepositoryJpa.save(new Author("firstName", "lastName"));
         Category category = categoryRepositoryJpa.save(new Category("category"));
-
         Book expected = new Book("new Book", List.of(author), List.of(category));
-
         Book actualInsert = bookRepositoryJpa.save(expected);
-
         assertEquals(expected, actualInsert);
+
+        bookRepositoryJpa.delete(expected);
     }
 
     @DisplayName("добавлять книгу в БД c сущетсвуещим автором")

@@ -4,9 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.context.annotation.Import;
 import ru.otus.library.domain.Book;
 import ru.otus.library.domain.Comment;
+import ru.otus.library.events.MongoBookCascadeDeleteEventsListener;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Репозиторий для работы с коментариями должно")
 @DataMongoTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Import(MongoBookCascadeDeleteEventsListener.class)
 class CommentRepositoryJpaTest {
 
     @Autowired
@@ -32,8 +33,9 @@ class CommentRepositoryJpaTest {
         Book book = all.get(0);
         Comment expected = new Comment("new comment", book);
         Comment actual = repository.save(expected);
-
         assertEquals(expected, actual);
+
+        repository.delete(expected);
     }
 
     @DisplayName("обновить коментарий в БД")
@@ -62,22 +64,6 @@ class CommentRepositoryJpaTest {
         assertEquals(expected.getBook().getTitle(), actual.getBook().getTitle());
     }
 
-    @DisplayName("возвращать коментарии по id книги")
-    @Test
-    public void shouldFindAllByBookId() {
-        List<String> actual = List.of(
-                "Увлекательная научная фантастика, читал на одном дыхании!",
-                "Персонажи такие живые, что кажется, будто сам в космосе путешествуешь!");
-
-        List<Book> all = bookRepository.findAll();
-        Book book = all.get(0);
-
-        List<Comment> comments = repository.findAllByBookId(book.getId());
-        List<String> expected = comments.stream().map(Comment::getText).toList();
-
-        assertEquals(actual, expected);
-    }
-
     @DisplayName("удалять коментарий по id")
     @Test
     public void shouldDeleteById() {
@@ -99,5 +85,21 @@ class CommentRepositoryJpaTest {
         List<Comment> comments = repository.findAll();
         Comment expected = repository.findById(comments.get(0).getId()).orElseThrow();
         assertNull(expected.getBook());
+    }
+
+    @DisplayName("возвращать коментарии по id книги")
+    @Test
+    public void shouldFindAllByBookId() {
+        List<String> actual = List.of(
+                "Очарован миром фэнтези от Алексея Петровича!",
+                "Эпические сражения и герои, которые остаются в памяти навсегда!");
+
+        List<Book> all = bookRepository.findAll();
+        Book book = all.get(0);
+
+        List<Comment> comments = repository.findAllByBookId(book.getId());
+        List<String> expected = comments.stream().map(Comment::getText).toList();
+
+        assertEquals(actual, expected);
     }
 }

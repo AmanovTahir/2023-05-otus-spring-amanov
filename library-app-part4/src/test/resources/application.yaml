@@ -1,12 +1,8 @@
 spring:
-  flyway:
-    enabled: false
-
   data:
     mongodb:
       port: 0
       database: test
-
 de:
   flapdoodle:
     mongodb:
