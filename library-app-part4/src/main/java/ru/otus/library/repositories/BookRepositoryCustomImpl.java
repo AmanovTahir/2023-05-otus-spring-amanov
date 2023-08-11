@@ -17,14 +17,14 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
     @Override
     public void removeAuthorsArrayElementsById(String id) {
         Query query = Query.query(Criteria.where("$id").is(new ObjectId(id)));
-        Update update = new Update().pull("author", query);
+        Update update = new Update().pull("authors", query);
         mongoTemplate.updateMulti(new Query(), update, Book.class);
     }
 
     @Override
     public void removeCategoriesArrayElementsById(String id) {
         Query query = Query.query(Criteria.where("$id").is(new ObjectId(id)));
-        Update update = new Update().pull("category", query);
+        Update update = new Update().pull("categories", query);
         mongoTemplate.updateMulti(new Query(), update, Book.class);
     }
 }
