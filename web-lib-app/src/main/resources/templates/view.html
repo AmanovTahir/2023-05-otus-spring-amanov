@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Book view</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        span {
+            color: #007bff;
+            margin-right: 5px;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Book: <span th:text="${book.title}"></span></h1>
+
+    <p>Authors:
+        <span th:each="author : ${book.authors}">
+            <span th:text="${author.firstName + ' ' + author.lastName}"></span>,
+        </span>
+    </p>
+
+    <p>Categories:
+        <span th:each="category : ${book.categories}">
+            <span th:text="${category.getName()}"></span>,
+        </span>
+    </p>
+
+    <p>Comments:
+        <span th:each="comment : ${book.comments}">
+            <span th:text="${comment.text}"></span>,
+        </span>
+    </p>
+    <a href="/books">Back to list</a>
+</div>
+</body>
+</html>

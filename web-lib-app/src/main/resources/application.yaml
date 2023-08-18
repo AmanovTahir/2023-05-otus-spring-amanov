@@ -1,0 +1,21 @@
+spring:
+
+  data:
+    mongodb:
+      database: library
+      host: localhost
+      port: 27017
+
+mongock:
+  change-logs-scan-package:
+    - ru.otus.library.changelog
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local
+logging:
+  level:
+    ru.otus.library: debug
+
+server:
+  port: 8000
