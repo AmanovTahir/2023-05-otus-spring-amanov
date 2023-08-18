@@ -8,3 +8,5 @@
 5) library-app Приложение хранящее информацию о книгах в библиотеке
 6) library-app-part2 Приложение хранящее информацию о книгах в библиотеке на ORM
 7) library-app-part3 Библиотека на Spring Data JPA
+8) library-app-part4 Библеотека на MongoDB
+9) web-library-app Web-приложение Библеотека
