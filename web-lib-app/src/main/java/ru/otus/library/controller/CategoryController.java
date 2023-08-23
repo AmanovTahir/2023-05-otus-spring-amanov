@@ -23,16 +23,16 @@ public class CategoryController {
 
 
     @PostMapping("/add")
-    public String addCategory(@ModelAttribute CategoryDto newCategory) {
-        Category category = categoryMapper.categoryDtoToCategory(newCategory);
+    public String add(@ModelAttribute CategoryDto categoryDto) {
+        Category category = categoryMapper.toDomain(categoryDto);
         categoryService.insert(category);
         return "redirect:/books";
     }
 
     @GetMapping("/add")
-    public String showAddCategoryForm(Model model) {
+    public String addForm(Model model) {
         model.addAttribute("newCategory", new CategoryDto());
-        return "category_add";
+        return "category/add";
     }
 
 }

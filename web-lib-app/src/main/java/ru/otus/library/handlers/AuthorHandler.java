@@ -8,7 +8,6 @@ import ru.otus.library.mapper.AuthorMapper;
 import ru.otus.library.services.AuthorService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -19,13 +18,16 @@ public class AuthorHandler {
     private final AuthorMapper authorMapper;
 
     public List<AuthorDto> getAll() {
-        return service.getAll().stream()
-                .map(authorMapper::authorToAuthorDto)
-                .collect(Collectors.toList());
+        List<Author> all = service.getAll();
+        return authorMapper.toDtoList(all);
     }
 
     public AuthorDto insert(Author author) {
         Author newAuthor = service.insert(author);
-        return authorMapper.authorToAuthorDto(newAuthor);
+        return authorMapper.toDto(newAuthor);
+    }
+
+    public List<AuthorDto> getByIds(List<String> ids) {
+        return ids.stream().map(service::getById).map(authorMapper::toDto).toList();
     }
 }

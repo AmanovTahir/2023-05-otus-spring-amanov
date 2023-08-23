@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.otus.library.domain.Author;
 import ru.otus.library.domain.Book;
 import ru.otus.library.domain.Category;
-import ru.otus.library.dto.AuthorDto;
 import ru.otus.library.dto.BookDto;
-import ru.otus.library.dto.CategoryDto;
 import ru.otus.library.dto.CommentDto;
 import ru.otus.library.mapper.AuthorMapper;
 import ru.otus.library.mapper.BookMapper;
@@ -29,7 +27,6 @@ public class BookHandler {
 
     private final CommentHandler commentHandler;
 
-
     private final CategoryMapper categoryMapper;
 
     private final AuthorMapper authorMapper;
@@ -38,12 +35,13 @@ public class BookHandler {
 
 
     public void addBook(BookDto bookDto) {
-        Book book = bookMapper.bookDtoToBook(bookDto);
+        Book book = bookMapper.toDomain(bookDto);
         bookService.insert(book);
     }
 
     public void updateBook(BookDto bookDto) {
-        Book book = bookMapper.bookDtoToBook(bookDto);
+        Book book = bookMapper.toDomain(bookDto);
+
         book.setAuthors(getAuthors(book));
         book.setCategories(getCategory(book));
 
@@ -53,28 +51,21 @@ public class BookHandler {
     public BookDto getBook(String id) {
         Book book = bookService.getById(id);
         List<CommentDto> comments = commentHandler.getCommentByBookId(id);
-        BookDto bookDto = bookMapper.bookToBookDto(book);
+
+        BookDto bookDto = bookMapper.toDto(book);
         bookDto.setComments(comments);
+
         return bookDto;
     }
 
     public List<BookDto> getAllBooks() {
         return bookService.getAll().stream()
-                .map(bookMapper::bookToBookDto)
+                .map(bookMapper::toDto)
                 .toList();
     }
 
-
     public void deleteBook(String id) {
         bookService.deleteById(id);
-    }
-
-    public List<AuthorDto> getAllAuthors() {
-        return authorHandler.getAll();
-    }
-
-    public List<CategoryDto> getAllCategories() {
-        return categoryHandler.getAll();
     }
 
     private List<Author> getAuthors(Book book) {
@@ -88,7 +79,7 @@ public class BookHandler {
     private Function<Category, Category> getCategoryFunction() {
         return category -> {
             if (category.getId() == null) {
-                return categoryMapper.categoryDtoToCategory(categoryHandler.insert(category));
+                return categoryMapper.toDomain(categoryHandler.insert(category));
             }
             return category;
         };
@@ -97,7 +88,7 @@ public class BookHandler {
     private Function<Author, Author> getAuthorFunction() {
         return author -> {
             if (author.getId() == null) {
-                return authorMapper.authorDtoToAuthor(authorHandler.insert(author));
+                return authorMapper.toDomain(authorHandler.insert(author));
             }
             return author;
         };

@@ -8,7 +8,6 @@ import ru.otus.library.mapper.CategoryMapper;
 import ru.otus.library.services.CategoryService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -19,10 +18,15 @@ public class CategoryHandler {
     private final CategoryMapper categoryMapper;
 
     public List<CategoryDto> getAll() {
-        return service.getAll().stream().map(categoryMapper::categoryToCategoryDto).collect(Collectors.toList());
+        List<Category> categories = service.getAll();
+        return categoryMapper.toDtoList(categories);
     }
 
     public CategoryDto insert(Category category) {
-        return categoryMapper.categoryToCategoryDto(service.insert(category));
+        return categoryMapper.toDto(service.insert(category));
+    }
+
+    public List<CategoryDto> getByIds(List<String> ids) {
+        return ids.stream().map(service::getById).map(categoryMapper::toDto).toList();
     }
 }

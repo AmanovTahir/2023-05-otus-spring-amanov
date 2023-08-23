@@ -78,27 +78,27 @@
 <body>
 <div class="container">
     <h1>Add Book</h1>
-    <form action="/books/add" method="post" th:object="${book}">
-        <label for="title">Title:</label>
-        <input id="title" name="title" required th:field="*{title}" type="text"><br>
+    <form method="post" th:action="@{/books/add}" th:object="${bookDto}">
+        <label for="book-title-input">Title:</label>
+        <input id="book-title-input" required th:field="*{title}" type="text"/>
 
-        <label for="authors">Authors:</label>
-        <div>
-            <select id="authors" multiple name="authors" th:field="*{authors}">
+        <div class="row">
+            <label for="book-author-input">Authors:</label>
+            <select id="book-author-input" multiple="multiple" name="authorsIds" required>
                 <option th:each="author : ${authors}"
                         th:text="${author.firstName + ' ' + author.lastName}"
-                        th:value="${author.id}"
-                />
+                        th:value="${author.id}">Автор
+                </option>
             </select>
         </div>
 
-        <label for="categories">Categories:</label>
-        <div>
-            <select id="categories" multiple name="categories" th:field="*{categories}">
+        <div class="row">
+            <label for="book-genre-input">Categories:</label>
+            <select id="book-genre-input" multiple="multiple" name="categoriesIds" required>
                 <option th:each="category : ${categories}"
                         th:text="${category.name}"
-                        th:value="${category.id}"
-                />
+                        th:value="${category.id}">Жанр
+                </option>
             </select>
         </div>
 

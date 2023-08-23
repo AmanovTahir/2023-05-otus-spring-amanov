@@ -84,23 +84,25 @@
         <label for="title">Title:</label>
         <input id="title" name="title" required th:field="*{title}" type="text"/><br>
 
-        <label for="authors">Authors:</label>
-        <div>
-            <select id="authors" multiple name="authors" th:field="*{authors}">
-                <option th:each="dto : ${authors}"
-                        th:text="${dto.firstName + ' ' + dto.lastName}"
-                        th:value="${dto.id}"
-                />
+        <div class="row">
+            <label for="book-author-input">Authors:</label>
+            <select id="book-author-input" multiple="multiple" name="authorsIds" required>
+                <option th:each="author : ${authors}"
+                        th:selected="${book.authors.contains(author)}"
+                        th:text="${author.firstName + ' ' + author.lastName}"
+                        th:value="${author.id}">Автор
+                </option>
             </select>
         </div>
 
-        <label for="categories">Categories:</label>
-        <div>
-            <select id="categories" multiple name="categories" th:field="*{categories}">
-                <option th:each="dto : ${categories}"
-                        th:text="${dto.name}"
-                        th:value="${dto.id}"
-                />
+        <div class="row">
+            <label for="book-genre-input">Categories:</label>
+            <select id="book-genre-input" multiple="multiple" name="categoriesIds" required>
+                <option th:each="category : ${categories}"
+                        th:selected="${book.categories.contains(category)}"
+                        th:text="${category.name}"
+                        th:value="${category.id}">Жанр
+                </option>
             </select>
         </div>
 

@@ -10,8 +10,10 @@ import ru.otus.library.domain.Author;
 import ru.otus.library.domain.Book;
 import ru.otus.library.domain.Category;
 import ru.otus.library.dto.BookDto;
+import ru.otus.library.mapper.AuthorMapperImpl;
 import ru.otus.library.mapper.BookMapper;
 import ru.otus.library.mapper.BookMapperImpl;
+import ru.otus.library.mapper.CategoryMapperImpl;
 import ru.otus.library.repositories.BookRepository;
 import ru.otus.library.services.impl.BookServiceImpl;
 
@@ -27,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 
 @SpringBootTest(classes = {
-        BookServiceImpl.class, BookMapperImpl.class
+        BookServiceImpl.class, BookMapperImpl.class, AuthorMapperImpl.class, CategoryMapperImpl.class
 })
 @DisplayName("Service для книг должен")
 class BookServiceImplTest {
@@ -64,7 +66,7 @@ class BookServiceImplTest {
         when(conversionService.convert(book, BookDto.class)).thenReturn(bookDto);
 
         List<BookDto> actual = bookService.getAll().stream()
-                .map(bookMapper::bookToBookDto)
+                .map(bookMapper::toDto)
                 .collect(Collectors.toList());
 
         assertNotNull(actual);
@@ -98,7 +100,7 @@ class BookServiceImplTest {
         when(bookRepository.save(expected)).thenReturn(expected);
         when(conversionService.convert(bookDto, BookDto.class)).thenReturn(bookDto);
 
-        BookDto actual = bookMapper.bookToBookDto(bookService.update(expected));
+        BookDto actual = bookMapper.toDto(bookService.update(expected));
 
         assertNotNull(actual);
     }

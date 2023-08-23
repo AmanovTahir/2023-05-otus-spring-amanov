@@ -5,15 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.otus.library.domain.Book;
 import ru.otus.library.dto.AuthorDto;
 import ru.otus.library.dto.BookDto;
 import ru.otus.library.dto.CategoryDto;
+import ru.otus.library.handlers.AuthorHandler;
 import ru.otus.library.handlers.BookHandler;
-import ru.otus.library.mapper.BookMapper;
+import ru.otus.library.handlers.CategoryHandler;
 
 import java.util.List;
 
@@ -23,64 +24,79 @@ import java.util.List;
 @Slf4j
 public class BookController {
 
-    private final BookMapper bookMapper;
+    private final BookHandler bookHandler;
 
-    private final BookHandler handler;
+    private final AuthorHandler authorHandler;
 
-    @GetMapping
-    public String getAllBooks(Model model) {
-        List<BookDto> all = handler.getAllBooks();
+    private final CategoryHandler categoryHandler;
+
+    @GetMapping("")
+    public String lists(Model model) {
+        List<BookDto> all = bookHandler.getAllBooks();
         model.addAttribute("books", all);
-        return "list";
+        return "book/list";
     }
 
     @PostMapping("/delete")
-    public String deleteBook(@RequestParam("id") String id) {
-        handler.deleteBook(id);
+    public String delete(@RequestParam("id") String id) {
+        bookHandler.deleteBook(id);
         return "redirect:/books";
     }
 
     @PostMapping("/update")
-    public String updateBook(Book book) {
-        handler.updateBook(bookMapper.bookToBookDto(book));
+    public String update(@ModelAttribute BookDto bookDto,
+                         @RequestParam(name = "authorsIds", required = false) List<String> authorsIds,
+                         @RequestParam(name = "categoriesIds", required = false) List<String> categoriesIds) {
+        fillBookDto(bookDto, authorsIds, categoriesIds);
+        bookHandler.updateBook(bookDto);
         return "redirect:/books";
     }
 
     @GetMapping("/edit")
-    public String editPageById(@RequestParam("id") String id, Model model) {
-        BookDto bookDto = handler.getBook(id);
-        List<AuthorDto> allAuthors = handler.getAllAuthors();
-        List<CategoryDto> allCategories = handler.getAllCategories();
+    public String edit(@RequestParam("id") String id, Model model) {
+        BookDto bookDto = bookHandler.getBook(id);
+        List<AuthorDto> allAuthors = authorHandler.getAll();
+        List<CategoryDto> allCategories = categoryHandler.getAll();
 
         model.addAttribute("book", bookDto);
         model.addAttribute("authors", allAuthors);
         model.addAttribute("categories", allCategories);
 
-        return "edit";
+        return "book/edit";
     }
 
     @GetMapping("/add")
-    public String addPage(Model model) {
-        List<AuthorDto> allAuthors = handler.getAllAuthors();
-        List<CategoryDto> allCategories = handler.getAllCategories();
+    public String add(Model model) {
+        BookDto bookDto = new BookDto();
+        List<AuthorDto> allAuthors = authorHandler.getAll();
+        List<CategoryDto> allCategories = categoryHandler.getAll();
 
-        model.addAttribute("book", new Book());
+        model.addAttribute("bookDto", bookDto);
         model.addAttribute("authors", allAuthors);
         model.addAttribute("categories", allCategories);
-
-        return "add_book";
+        return "book/add";
     }
 
     @PostMapping("/add")
-    public String addBook(Book book) {
-        handler.addBook(bookMapper.bookToBookDto(book));
+    public String add(@ModelAttribute BookDto bookDto,
+                      @RequestParam(name = "authorsIds", required = false) List<String> authorsIds,
+                      @RequestParam(name = "categoriesIds", required = false) List<String> categoriesIds) {
+        fillBookDto(bookDto, authorsIds, categoriesIds);
+        bookHandler.addBook(bookDto);
         return "redirect:/books";
     }
 
     @GetMapping("/book")
-    public String viewPage(@RequestParam("id") String id, Model model) {
-        BookDto bookDto = handler.getBook(id);
+    public String view(@RequestParam("id") String id, Model model) {
+        BookDto bookDto = bookHandler.getBook(id);
         model.addAttribute("book", bookDto);
-        return "view";
+        return "book/view";
+    }
+
+    private void fillBookDto(BookDto dto, List<String> authorsIds, List<String> categoriesIds) {
+        List<CategoryDto> categoriesByIds = categoryHandler.getByIds(categoriesIds);
+        List<AuthorDto> authorsByIds = authorHandler.getByIds(authorsIds);
+        dto.setAuthors(authorsByIds);
+        dto.setCategories(categoriesByIds);
     }
 }

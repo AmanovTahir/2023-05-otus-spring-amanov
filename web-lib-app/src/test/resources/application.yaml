@@ -3,6 +3,9 @@ spring:
     mongodb:
       port: 0
       database: test
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
 de:
   flapdoodle:
     mongodb:

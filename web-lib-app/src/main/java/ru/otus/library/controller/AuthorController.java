@@ -22,15 +22,15 @@ public class AuthorController {
     private final AuthorMapper authorMapper;
 
     @PostMapping("/add")
-    public String addAuthor(@ModelAttribute AuthorDto newAuthor) {
-        Author author = authorMapper.authorDtoToAuthor(newAuthor);
+    public String add(@ModelAttribute AuthorDto authorDto) {
+        Author author = authorMapper.toDomain(authorDto);
         authorService.insert(author);
         return "redirect:/books";
     }
 
     @GetMapping("/add")
-    public String showAddAuthorForm(Model model) {
+    public String addForm(Model model) {
         model.addAttribute("newAuthor", new AuthorDto());
-        return "author_add";
+        return "author/add";
     }
 }

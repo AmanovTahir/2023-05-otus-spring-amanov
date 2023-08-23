@@ -30,7 +30,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     public List<CommentDto> getAllByBookId(String bookId) {
         List<Comment> allByBookId = repository.findAllByBookId(bookId);
-        return allByBookId.stream().map(commentMapper::commentToCommentDto)
+        return allByBookId.stream().map(commentMapper::toDto)
                 .collect(Collectors.toList());
     }
 

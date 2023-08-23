@@ -4,15 +4,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.library.dto.AuthorDto;
 import ru.otus.library.dto.BookDto;
 import ru.otus.library.dto.CategoryDto;
 import ru.otus.library.dto.CommentDto;
+import ru.otus.library.handlers.AuthorHandler;
 import ru.otus.library.handlers.BookHandler;
+import ru.otus.library.handlers.CategoryHandler;
+import ru.otus.library.mapper.AuthorMapperImpl;
+import ru.otus.library.mapper.BookMapperImpl;
+import ru.otus.library.mapper.CategoryMapperImpl;
+import ru.otus.library.mapper.CommentMapperImpl;
+import ru.otus.library.services.AuthorService;
+import ru.otus.library.services.BookService;
+import ru.otus.library.services.CategoryService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,10 +41,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-
-@SpringBootTest()
-@AutoConfigureMockMvc
+@WebMvcTest
 @DisplayName("BookController должен")
+@TestPropertySource(properties = "mongock.enabled=false")
+@Import({AuthorMapperImpl.class, CategoryMapperImpl.class, BookMapperImpl.class, CommentMapperImpl.class})
 class BookControllerTest {
 
     private final List<BookDto> books = new ArrayList<>();
@@ -43,7 +53,22 @@ class BookControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private BookHandler handler;
+    private BookHandler bookHandler;
+
+    @MockBean
+    private AuthorHandler authorHandler;
+
+    @MockBean
+    private CategoryHandler categoryHandler;
+
+    @MockBean
+    private AuthorService authorService;
+
+    @MockBean
+    private CategoryService categoryService;
+
+    @MockBean
+    private BookService bookService;
 
     private static HashMap<Integer, AuthorDto> getAuthorMap() {
         return new HashMap<>() {{
@@ -79,11 +104,11 @@ class BookControllerTest {
     @Test
     @DisplayName("вернуть все книги")
     void shouldGetAllBooks() throws Exception {
-        when(handler.getAllBooks()).thenReturn(books);
+        when(bookHandler.getAllBooks()).thenReturn(books);
 
         mockMvc.perform(get("/books"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("list"))
+                .andExpect(view().name("book/list"))
                 .andExpect(model().attribute("books", hasSize(2)));
     }
 
@@ -96,7 +121,7 @@ class BookControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/books"));
 
-        verify(handler).deleteBook(bookId);
+        verify(bookHandler).deleteBook(bookId);
     }
 
     @Test
@@ -108,13 +133,13 @@ class BookControllerTest {
         List<AuthorDto> authors = new ArrayList<>();
         List<CategoryDto> categories = new ArrayList<>();
 
-        when(handler.getBook(bookId)).thenReturn(bookDto);
-        when(handler.getAllAuthors()).thenReturn(authors);
-        when(handler.getAllCategories()).thenReturn(categories);
+        when(bookHandler.getBook(bookId)).thenReturn(bookDto);
+        when(authorHandler.getAll()).thenReturn(authors);
+        when(categoryHandler.getAll()).thenReturn(categories);
 
         mockMvc.perform(get("/books/edit").param("id", bookId))
                 .andExpect(status().isOk())
-                .andExpect(view().name("edit"))
+                .andExpect(view().name("book/edit"))
                 .andExpect(model().attribute("book", equalTo(bookDto)))
                 .andExpect(model().attribute("authors", equalTo(authors)))
                 .andExpect(model().attribute("categories", equalTo(categories)));
@@ -131,13 +156,13 @@ class BookControllerTest {
         List<AuthorDto> authors = new ArrayList<>();
         List<CategoryDto> categories = new ArrayList<>();
 
-        when(handler.getAllAuthors()).thenReturn(authors);
-        when(handler.getAllCategories()).thenReturn(categories);
+        when(authorHandler.getAll()).thenReturn(authors);
+        when(categoryHandler.getAll()).thenReturn(categories);
 
         mockMvc.perform(get("/books/add"))
                 .andExpect(status().isOk())
                 .andExpect(view().name(
-                        "add_book"))
+                        "book/add"))
                 .andExpect(model().attribute("authors", equalTo(authors)))
                 .andExpect(model().attribute("categories", equalTo(categories)));
 
@@ -152,12 +177,12 @@ class BookControllerTest {
         String bookId = "id";
         BookDto bookDto = new BookDto("simple book");
 
-        when(handler.getBook(bookId)).thenReturn(bookDto);
+        when(bookHandler.getBook(bookId)).thenReturn(bookDto);
 
         mockMvc.perform(get("/books/book").param("id", bookId))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("book", equalTo(bookDto)))
-                .andExpect(view().name("view"));
+                .andExpect(view().name("book/view"));
     }
 
     private ArrayList<CommentDto> getComments() {
