@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.library.dto.AuthorDto;
@@ -16,10 +15,6 @@ import ru.otus.library.dto.CommentDto;
 import ru.otus.library.handlers.AuthorHandler;
 import ru.otus.library.handlers.BookHandler;
 import ru.otus.library.handlers.CategoryHandler;
-import ru.otus.library.mapper.AuthorMapperImpl;
-import ru.otus.library.mapper.BookMapperImpl;
-import ru.otus.library.mapper.CategoryMapperImpl;
-import ru.otus.library.mapper.CommentMapperImpl;
 import ru.otus.library.services.AuthorService;
 import ru.otus.library.services.BookService;
 import ru.otus.library.services.CategoryService;
@@ -41,10 +36,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-@WebMvcTest
+@WebMvcTest(BookController.class)
 @DisplayName("BookController должен")
 @TestPropertySource(properties = "mongock.enabled=false")
-@Import({AuthorMapperImpl.class, CategoryMapperImpl.class, BookMapperImpl.class, CommentMapperImpl.class})
 class BookControllerTest {
 
     private final List<BookDto> books = new ArrayList<>();
@@ -69,6 +63,7 @@ class BookControllerTest {
 
     @MockBean
     private BookService bookService;
+
 
     private static HashMap<Integer, AuthorDto> getAuthorMap() {
         return new HashMap<>() {{

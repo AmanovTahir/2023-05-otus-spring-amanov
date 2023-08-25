@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.otus.library.dto.AuthorDto;
 import ru.otus.library.dto.BookDto;
 import ru.otus.library.dto.CategoryDto;
+import ru.otus.library.dto.RequestBookDto;
 import ru.otus.library.handlers.AuthorHandler;
 import ru.otus.library.handlers.BookHandler;
 import ru.otus.library.handlers.CategoryHandler;
@@ -44,21 +45,21 @@ public class BookController {
     }
 
     @PostMapping("/update")
-    public String update(@ModelAttribute BookDto bookDto,
-                         @RequestParam(name = "authorsIds", required = false) List<String> authorsIds,
-                         @RequestParam(name = "categoriesIds", required = false) List<String> categoriesIds) {
-        fillBookDto(bookDto, authorsIds, categoriesIds);
-        bookHandler.updateBook(bookDto);
+    public String update(@ModelAttribute RequestBookDto requestDto) {
+        bookHandler.updateBook(requestDto);
         return "redirect:/books";
     }
 
     @GetMapping("/edit")
     public String edit(@RequestParam("id") String id, Model model) {
         BookDto bookDto = bookHandler.getBook(id);
+
+        RequestBookDto requestDto = new RequestBookDto();
+        requestDto.setBookDto(bookDto);
         List<AuthorDto> allAuthors = authorHandler.getAll();
         List<CategoryDto> allCategories = categoryHandler.getAll();
 
-        model.addAttribute("book", bookDto);
+        model.addAttribute("addRequestDto", requestDto);
         model.addAttribute("authors", allAuthors);
         model.addAttribute("categories", allCategories);
 
@@ -66,23 +67,20 @@ public class BookController {
     }
 
     @GetMapping("/add")
-    public String add(Model model) {
-        BookDto bookDto = new BookDto();
+    public String addForm(Model model) {
+        RequestBookDto requestDto = new RequestBookDto();
         List<AuthorDto> allAuthors = authorHandler.getAll();
         List<CategoryDto> allCategories = categoryHandler.getAll();
 
-        model.addAttribute("bookDto", bookDto);
+        model.addAttribute("addRequestDto", requestDto);
         model.addAttribute("authors", allAuthors);
         model.addAttribute("categories", allCategories);
         return "book/add";
     }
 
     @PostMapping("/add")
-    public String add(@ModelAttribute BookDto bookDto,
-                      @RequestParam(name = "authorsIds", required = false) List<String> authorsIds,
-                      @RequestParam(name = "categoriesIds", required = false) List<String> categoriesIds) {
-        fillBookDto(bookDto, authorsIds, categoriesIds);
-        bookHandler.addBook(bookDto);
+    public String add(@ModelAttribute RequestBookDto requestDto) {
+        bookHandler.addBook(requestDto);
         return "redirect:/books";
     }
 
@@ -93,10 +91,4 @@ public class BookController {
         return "book/view";
     }
 
-    private void fillBookDto(BookDto dto, List<String> authorsIds, List<String> categoriesIds) {
-        List<CategoryDto> categoriesByIds = categoryHandler.getByIds(categoriesIds);
-        List<AuthorDto> authorsByIds = authorHandler.getByIds(authorsIds);
-        dto.setAuthors(authorsByIds);
-        dto.setCategories(categoriesByIds);
-    }
 }

@@ -5,8 +5,11 @@ import org.springframework.stereotype.Service;
 import ru.otus.library.domain.Author;
 import ru.otus.library.domain.Book;
 import ru.otus.library.domain.Category;
+import ru.otus.library.dto.AuthorDto;
 import ru.otus.library.dto.BookDto;
+import ru.otus.library.dto.CategoryDto;
 import ru.otus.library.dto.CommentDto;
+import ru.otus.library.dto.RequestBookDto;
 import ru.otus.library.mapper.AuthorMapper;
 import ru.otus.library.mapper.BookMapper;
 import ru.otus.library.mapper.CategoryMapper;
@@ -34,18 +37,28 @@ public class BookHandler {
     private final BookMapper bookMapper;
 
 
-    public void addBook(BookDto bookDto) {
-        Book book = bookMapper.toDomain(bookDto);
+    public void addBook(RequestBookDto dto) {
+        fillBookDto(dto);
+
+        Book book = bookMapper.toDomain(dto.getBookDto());
         bookService.insert(book);
     }
 
-    public void updateBook(BookDto bookDto) {
-        Book book = bookMapper.toDomain(bookDto);
+    public void updateBook(RequestBookDto dto) {
+        fillBookDto(dto);
 
+        Book book = bookMapper.toDomain(dto.getBookDto());
         book.setAuthors(getAuthors(book));
         book.setCategories(getCategory(book));
 
         bookService.update(book);
+    }
+
+    private void fillBookDto(RequestBookDto dto) {
+        List<CategoryDto> categoriesByIds = categoryHandler.getByIds(dto.getCategoriesIds());
+        List<AuthorDto> authorsByIds = authorHandler.getByIds(dto.getAuthorsIds());
+        dto.getBookDto().setAuthors(authorsByIds);
+        dto.getBookDto().setCategories(categoriesByIds);
     }
 
     public BookDto getBook(String id) {

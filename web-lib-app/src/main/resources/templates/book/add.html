@@ -78,9 +78,9 @@
 <body>
 <div class="container">
     <h1>Add Book</h1>
-    <form method="post" th:action="@{/books/add}" th:object="${bookDto}">
+    <form method="post" th:action="@{/books/add}" th:object="${addRequestDto}">
         <label for="book-title-input">Title:</label>
-        <input id="book-title-input" required th:field="*{title}" type="text"/>
+        <input id="book-title-input" required th:field="*{bookDto.title}" type="text"/>
 
         <div class="row">
             <label for="book-author-input">Authors:</label>
