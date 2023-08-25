@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Library App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            padding: 50px 0;
+            margin: 0;
+        }
+
+        nav {
+            background-color: #007bff;
+            padding: 10px;
+        }
+
+        button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h1>Welcome to Library!</h1>
+<nav>
+    <button onclick="window.location.href = '/books'">List books</button>
+    <button onclick="window.location.href = '/books/add'">Add book</button>
+</nav>
+</body>
+</html>
