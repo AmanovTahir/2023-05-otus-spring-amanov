@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all books</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            color: #333;
+        }
+
+        .books-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .books-table th,
+        .books-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .books-table th {
+            background-color: #f5f5f5;
+        }
+
+        .books-table td a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .books-table td a:hover {
+            text-decoration: underline;
+        }
+
+        .edit-link {
+            margin-left: 10px;
+        }
+
+        .add-book-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-book-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h3>Books:</h3>
+
+    <table class="books-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="book : ${books}">
+            <td th:text="${book.id}">1</td>
+            <td>
+                <a href="view.html" th:href="@{/books/book(id=${book.id})}" th:text="${book.title}">Simple Book</a>
+            </td>
+            <td>
+                <a class="edit-link" href="edit.html" th:href="@{/books/edit(id=${book.id})}">Edit</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="margin-top: 20px;">
+        <a class="add-book-button" href="add.html" th:href="@{/books/add}">Add Book</a>
+    </div>
+</div>
+</body>
+</html>

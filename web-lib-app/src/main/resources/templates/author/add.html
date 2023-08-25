@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Add New Author</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button[type="button"] {
+            background-color: #ccc;
+            margin-left: 10px;
+        }
+
+        button[type="submit"]:hover, button[type="button"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h1>Add New Author</h1>
+<form action="/authors/add" method="post">
+    <label for="firstName">First Name:</label>
+    <input id="firstName" name="firstName" required type="text"/><br>
+
+    <label for="lastName">Last Name:</label>
+    <input id="lastName" name="lastName" required type="text"/><br>
+
+    <button type="submit">Add Author</button>
+    <a href="/books">
+        <button type="button">Cancel</button>
+    </a>
+</form>
+</body>
+</html>
