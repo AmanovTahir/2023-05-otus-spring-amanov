@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details</title>
+</head>
+<body>
+<h1>Book Details</h1>
+<div id="bookDetails"></div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const bookId = params.get("id");
+    const bookDetailsContainer = document.getElementById("bookDetails");
+
+    fetch(`http://localhost:8000/api/book/${bookId}`)
+        .then(response => response.json())
+        .then(book => {
+            bookDetailsContainer.innerHTML = `
+                    <h2>${book.title}</h2>
+                    <p>Authors: ${book.authors.map(author => author.firstName + ' ' + author.lastName).join(", ")}</p>
+                    <p>Categories: ${book.categories.map(category => category.name).join(", ")}</p>
+                    <p>Comments: ${book.comments.map(comment => comment.text).join(", ")}</p>
+                `;
+        })
+        .catch(error => console.error("Error:", error));
+</script>
+</body>
+</html>
