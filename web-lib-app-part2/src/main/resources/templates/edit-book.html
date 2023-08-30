@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Book</title>
+    <script th:inline="javascript">
+        const bookId = /*[[${bookId}]]*/ null;
+    </script>
     <style type="text/css">
         body {
             padding: 50px;
@@ -43,107 +46,79 @@
 </form>
 
 <script>
-    const selectedAuthors = [];
-    const selectedCategories = [];
-
-    function loadBookData() {
-        const params = new URLSearchParams(window.location.search);
-        const bookId = params.get("id");
-        fetch(`http://localhost:8000/api/book/${bookId}`)
-            .then(response => response.json())
-            .then(bookData => {
-                document.getElementById('title').value = bookData.title;
-                selectedAuthors.push(...bookData.authors.map(author => author.id));
-                selectedCategories.push(...bookData.categories.map(category => category.id));
-                populateAuthorDropdown();
-                populateCategoryDropdown();
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-    }
-
-    function editBook(formData) {
-        const params = new URLSearchParams(window.location.search);
-        const bookId = params.get("id");
-        fetch(`http://localhost:8000/api/book/${bookId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(formData)
-        }).then(response => {
-            if (response.ok) {
-                window.location.href = "list.html";
-            } else {
-                console.error("Error:", response.statusText);
-            }
-        }).catch(error => {
-            console.error("Error:", error);
-        });
-    }
-
-    function populateAuthorDropdown() {
-        const authorSelect = document.getElementById("author");
-        Array.from(authorSelect.options).forEach(option => {
-            const authorId = JSON.parse(option.value).id;
-            option.selected = selectedAuthors.includes(authorId);
-        });
-    }
-
-    function populateCategoryDropdown() {
-        const categorySelect = document.getElementById("category");
-        Array.from(categorySelect.options).forEach(option => {
-            const categoryId = JSON.parse(option.value).id;
-            option.selected = selectedCategories.includes(categoryId);
-        });
-    }
-
-    function initializeForm() {
-        Promise.all([
-            fetch('http://localhost:8000/api/author/'),
-            fetch('http://localhost:8000/api/category/')
-        ])
-            .then(([authorsResponse, categoriesResponse]) => Promise.all([authorsResponse.json(), categoriesResponse.json()]))
-            .then(([authors, categories]) => {
-                const authorSelect = document.getElementById("author");
-                authors.forEach(author => {
-                    const option = document.createElement("option");
-                    option.value = JSON.stringify(author);
-                    option.textContent = author.firstName + " " + author.lastName;
-                    authorSelect.appendChild(option);
-                });
-
-                const categorySelect = document.getElementById("category");
-                categories.forEach(category => {
-                    const option = document.createElement("option");
-                    option.value = JSON.stringify(category);
-                    option.textContent = category.name;
-                    categorySelect.appendChild(option);
-                });
-
-                loadBookData();
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-    }
-
     document.addEventListener("DOMContentLoaded", function () {
-        initializeForm();
-
         const formElem = document.getElementById("formElem");
+
+        function editBook(bookId, formData) {
+            fetch(`/api/book/${bookId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            }).then(response => {
+                if (response.ok) {
+                   location.href = "/books/";
+                } else {
+                    console.error("Error:", response.statusText);
+                }
+            }).catch(error => {
+                console.error("Error:", error);
+            });
+        }
+
+        function bookData(bookId) {
+            return fetch(`/api/book/${bookId}`)
+                .then(response => response.json());
+        }
+
+        function authors() {
+            return fetch('/api/author/')
+                .then(response => response.json());
+        }
+
+        function categories() {
+            return fetch('/api/category/')
+                .then(response => response.json());
+        }
+
+        function populateDropdown(selectElem, data, selectedIds) {
+            data.forEach(item => {
+                const option = document.createElement("option");
+                option.value = JSON.stringify(item);
+                option.textContent = item.name || (item.firstName + " " + item.lastName);
+                option.selected = selectedIds.includes(item.id);
+                selectElem.appendChild(option);
+            });
+        }
+
         formElem.addEventListener("submit", function (event) {
             event.preventDefault();
 
             const formData = {
-                id: new URLSearchParams(window.location.search).get("id"),
+                id: bookId,
                 title: formElem.querySelector('input[name="title"]').value,
                 authors: Array.from(formElem.querySelectorAll('select[name="author"] option:checked')).map(option => JSON.parse(option.value)),
                 categories: Array.from(formElem.querySelectorAll('select[name="category"] option:checked')).map(option => JSON.parse(option.value))
             };
 
-            editBook(formData);
+            editBook(bookId, formData);
+        });
+
+        Promise.all([
+            bookData(bookId),
+            authors(),
+            categories()
+        ]).then(([bookData, authors, categories]) => {
+            document.getElementById('title').value = bookData.title;
+
+            const selectedAuthors = bookData.authors.map(author => author.id);
+            const selectedCategories = bookData.categories.map(category => category.id);
+
+            populateDropdown(document.getElementById("author"), authors, selectedAuthors);
+            populateDropdown(document.getElementById("category"), categories, selectedCategories);
+        }).catch(error => {
+            console.error("Error:", error);
         });
     });
 </script>
