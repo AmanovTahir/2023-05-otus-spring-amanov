@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="keywords" th:content="${keywords}"/>
     <title>List of all books</title>
     <style type="text/css">
         body {
@@ -28,7 +27,7 @@
 <body>
 <h1>Books:</h1>
 
-<a href="add-book.html" th:href="@{/add-book}">Add new</a>
+<a href="/books/add">Add new</a>
 <table class="books">
     <thead>
     <tr>
@@ -48,7 +47,7 @@
     const bookListBody = document.getElementById("bookListBody");
 
     function fetchBooks() {
-        fetch('http://localhost:8000/api/book/')
+        fetch('/api/book/')
             .then(response => response.json())
             .then(displayBooks)
             .catch(error => console.error("Error:", error));
@@ -64,7 +63,7 @@
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${book.id}</td>
-                <td><a href="book-details.html?id=${book.id}">${book.title}</a></td>
+                <td><a href=/books/${book.id}>${book.title}</a></td>
                 <td>${authors}</td>
                 <td>${categories}</td>
                 <td><button class="deleteBookButton" data-book-id="${book.id}">Delete</button></td>
@@ -86,7 +85,7 @@
 
     function deleteBook(event) {
         const bookId = event.target.getAttribute("data-book-id");
-        fetch(`http://localhost:8000/api/book/${bookId}`, {
+        fetch(`/api/book/${bookId}`, {
             method: "DELETE"
         })
             .then(() => {
@@ -96,7 +95,7 @@
 
     function editBook(event) {
         const bookId = event.target.getAttribute("data-book-id");
-        window.location.href = `edit-book.html?id=${bookId}`;
+        location.href = `/books/edit/${bookId}`;
     }
 
     document.addEventListener("DOMContentLoaded", fetchBooks);

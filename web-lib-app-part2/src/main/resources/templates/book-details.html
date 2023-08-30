@@ -1,30 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Details</title>
+    <script th:inline="javascript">
+        const bookId = /*[[${bookId}]]*/ null;
+    </script>
 </head>
 <body>
 <h1>Book Details</h1>
 <div id="bookDetails"></div>
 
 <script>
-    const params = new URLSearchParams(window.location.search);
-    const bookId = params.get("id");
-    const bookDetailsContainer = document.getElementById("bookDetails");
+    document.addEventListener("DOMContentLoaded", function () {
+        const bookDetailsContainer = document.getElementById("bookDetails");
+        fetch(`/api/book/${bookId}`)
+            .then(response => response.json())
+            .then(book => {
+                const authors = book.authors.map(author => `${author.firstName} ${author.lastName}`).join(", ");
+                const categories = book.categories.map(category => category.name).join(", ");
+                const comments = book.comments.map(comment => comment.text).join(", ");
 
-    fetch(`http://localhost:8000/api/book/${bookId}`)
-        .then(response => response.json())
-        .then(book => {
-            bookDetailsContainer.innerHTML = `
-                    <h2>${book.title}</h2>
-                    <p>Authors: ${book.authors.map(author => author.firstName + ' ' + author.lastName).join(", ")}</p>
-                    <p>Categories: ${book.categories.map(category => category.name).join(", ")}</p>
-                    <p>Comments: ${book.comments.map(comment => comment.text).join(", ")}</p>
-                `;
-        })
-        .catch(error => console.error("Error:", error));
+                bookDetailsContainer.innerHTML = `
+                        <h2>${book.title}</h2>
+                        <p>Authors: ${authors}</p>
+                        <p>Categories: ${categories}</p>
+                        <p>Comments: ${comments}</p>
+                    `;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+    });
 </script>
 </body>
 </html>
