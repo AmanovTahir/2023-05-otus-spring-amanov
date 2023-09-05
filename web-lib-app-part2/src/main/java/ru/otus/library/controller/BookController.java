@@ -2,6 +2,8 @@ package ru.otus.library.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,11 +26,13 @@ public class BookController {
     private final BookHandler bookHandler;
 
     @GetMapping("/")
+    @Cacheable(value = "bookCache")
     public List<BookDto> getAllBooks() {
         return bookHandler.getAllBooks();
     }
 
     @GetMapping("/{id}")
+    @Cacheable(value = "bookPostCache")
     public BookDto getBook(@PathVariable String id) {
         return bookHandler.getBook(id);
     }
@@ -44,6 +48,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
+    @CacheEvict(value = {"bookPostCache", "bookCache"}, allEntries = true)
     public BookDto editBook(@PathVariable String id, @RequestBody BookDto dto) {
         dto.setId(id);
         return bookHandler.updateBook(dto);

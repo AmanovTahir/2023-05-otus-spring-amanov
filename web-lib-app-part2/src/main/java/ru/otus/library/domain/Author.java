@@ -8,13 +8,15 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
+
 
 @Getter
 @Setter
 @ToString
 @Document("authors")
 @NoArgsConstructor
-public class Author {
+public class Author implements Serializable {
     @Id
     private String id;
 
