@@ -39,7 +39,7 @@
     </div>
     <div>
         <button type="submit">Add Book</button>
-        <a href="/books/">
+        <a href="/">
             <button type="button">Go Back</button>
         </a>
     </div>
@@ -55,7 +55,7 @@
             body: JSON.stringify(formData)
         }).then(rawResponse => {
             if (rawResponse.ok) {
-                location.href = '/books/';
+                location.href = '/';
             } else {
                 console.error("Error:", rawResponse.statusText);
             }
