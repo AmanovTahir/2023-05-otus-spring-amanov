@@ -1,0 +1,30 @@
+package ru.otus.library.repositories;
+
+import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Repository;
+import ru.otus.library.domain.Book;
+
+@Repository
+@RequiredArgsConstructor
+public class BookRepositoryCustomImpl implements BookRepositoryCustom {
+    private final ReactiveMongoTemplate mongoTemplate;
+
+    @Override
+    public void removeAuthorsArrayElementsById(String id) {
+        Query query = Query.query(Criteria.where("$id").is(new ObjectId(id)));
+        Update update = new Update().pull("authors", query);
+        mongoTemplate.updateMulti(new Query(), update, Book.class).block();
+    }
+
+    @Override
+    public void removeCategoriesArrayElementsById(String id) {
+        Query query = Query.query(Criteria.where("$id").is(new ObjectId(id)));
+        Update update = new Update().pull("categories", query);
+        mongoTemplate.updateMulti(new Query(), update, Book.class).block();
+    }
+}
