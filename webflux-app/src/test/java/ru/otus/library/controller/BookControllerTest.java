@@ -133,7 +133,6 @@ class BookControllerTest {
                 .jsonPath("$.authors").isArray()
                 .jsonPath("$.categories").isArray()
                 .jsonPath("$.title").isEqualTo(bookDto.getTitle());
-
     }
 
     @Test

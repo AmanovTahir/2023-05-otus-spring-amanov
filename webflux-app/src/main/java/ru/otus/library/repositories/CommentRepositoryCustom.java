@@ -7,5 +7,4 @@ public interface CommentRepositoryCustom {
 
     Flux<Comment> findAllByBookId(String id);
 
-    void removeBookById(String id);
 }

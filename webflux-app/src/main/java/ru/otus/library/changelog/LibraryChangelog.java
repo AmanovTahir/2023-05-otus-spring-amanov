@@ -1,8 +1,16 @@
 package ru.otus.library.changelog;
 
-import com.github.cloudyrock.mongock.ChangeLog;
-import com.github.cloudyrock.mongock.ChangeSet;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.reactivestreams.client.MongoDatabase;
+import io.mongock.api.annotations.ChangeUnit;
+import io.mongock.api.annotations.Execution;
+import io.mongock.api.annotations.RollbackExecution;
+import io.mongock.driver.mongodb.reactive.util.MongoSubscriberSync;
+import io.mongock.driver.mongodb.reactive.util.SubscriberSync;
+import lombok.RequiredArgsConstructor;
+import org.bson.Document;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.otus.library.domain.Author;
 import ru.otus.library.domain.Book;
 import ru.otus.library.domain.Category;
@@ -19,9 +27,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@ChangeLog(order = "001")
+@ChangeUnit(id = "initDatabase", order = "001", author = "tamanov")
+@RequiredArgsConstructor
 public class LibraryChangelog {
-    private static final String NAME = "tamanov";
+
+    private final AuthorRepository authorRepository;
+
+    private final BookRepository bookRepository;
+
+    private final CommentRepository commentRepository;
+
+    private final CategoryRepository categoryRepository;
+
+    private final MongoDatabase mongoDatabase;
+
 
     private final Map<Integer, Author> authors = new HashMap<>() {{
         put(1, new Author("Мария", "Иванова"));
@@ -30,6 +49,7 @@ public class LibraryChangelog {
         put(4, new Author("Александр", "Иванов"));
         put(5, new Author("Анна", "Карпова"));
     }};
+
 
     private final Map<Integer, Category> categoryMap = new HashMap<>() {{
         put(1, new Category("Научная фантастика"));
@@ -41,30 +61,39 @@ public class LibraryChangelog {
 
     private final List<Book> bookList = new ArrayList<>();
 
-
-    @ChangeSet(order = "000", id = "dropDB", author = NAME, runAlways = true)
-    public void dropDB(MongoDatabase database) {
-        database.drop();
+    @Execution
+    public void initDB() {
+        insertAuthors(authorRepository);
+        insertCategories(categoryRepository);
+        insertBooks(bookRepository);
+        insertComments(commentRepository);
     }
 
-    @ChangeSet(order = "001", id = "insertAuthors", author = NAME, runAlways = true)
+    @RollbackExecution
+    public void rollbackExecution() {
+        SubscriberSync<DeleteResult> subscriber = new MongoSubscriberSync<>();
+        Flux.from(mongoDatabase.listCollectionNames())
+                .flatMap(collectionName ->
+                        Mono.from(mongoDatabase.getCollection(collectionName)
+                                .deleteMany(new Document()))
+                ).subscribe(subscriber);
+        subscriber.await();
+    }
+
     public void insertAuthors(AuthorRepository repository) {
         repository.saveAll(authors.values()).collectList().block();
     }
 
-    @ChangeSet(order = "002", id = "insertCategories", author = NAME, runAlways = true)
     public void insertCategories(CategoryRepository repository) {
         repository.saveAll(categoryMap.values()).collectList().block();
     }
 
-    @ChangeSet(order = "003", id = "insertBooks", author = NAME, runAlways = true)
     public void insertBooks(BookRepository repository) {
         List<Book> books = getBookList();
         List<Book> block = repository.saveAll(books).collectList().block();
         bookList.addAll(Objects.requireNonNull(block));
     }
 
-    @ChangeSet(order = "004", id = "insertComments", author = NAME, runAlways = true)
     public void insertComments(CommentRepository repository) {
         List<Comment> comments = getCommentList(bookList);
         repository.saveAll(comments).collectList().block();
