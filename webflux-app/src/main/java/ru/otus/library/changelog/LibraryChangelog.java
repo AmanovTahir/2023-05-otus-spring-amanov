@@ -20,14 +20,12 @@ import ru.otus.library.repositories.BookRepository;
 import ru.otus.library.repositories.CategoryRepository;
 import ru.otus.library.repositories.CommentRepository;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-@ChangeUnit(id = "initDatabase", order = "001", author = "tamanov")
+@ChangeUnit(id = "initDatabase", order = "001", author = "tamanov", runAlways = true)
 @RequiredArgsConstructor
 public class LibraryChangelog {
 
@@ -50,7 +48,6 @@ public class LibraryChangelog {
         put(5, new Author("Анна", "Карпова"));
     }};
 
-
     private final Map<Integer, Category> categoryMap = new HashMap<>() {{
         put(1, new Category("Научная фантастика"));
         put(2, new Category("Фэнтези"));
@@ -59,14 +56,14 @@ public class LibraryChangelog {
         put(5, new Category("Приключенческая фантазия для детей"));
     }};
 
-    private final List<Book> bookList = new ArrayList<>();
-
     @Execution
     public void initDB() {
-        insertAuthors(authorRepository);
-        insertCategories(categoryRepository);
-        insertBooks(bookRepository);
-        insertComments(commentRepository);
+        rollbackExecution();
+        insertAuthors(authorRepository)
+                .thenMany(insertCategories(categoryRepository))
+                .then(insertBooks(bookRepository).collectList())
+                .flatMapMany(bookList -> insertComments(commentRepository, bookList))
+                .subscribe();
     }
 
     @RollbackExecution
@@ -80,23 +77,20 @@ public class LibraryChangelog {
         subscriber.await();
     }
 
-    public void insertAuthors(AuthorRepository repository) {
-        repository.saveAll(authors.values()).collectList().block();
+    public Flux<Author> insertAuthors(AuthorRepository repository) {
+        return repository.saveAll(authors.values());
     }
 
-    public void insertCategories(CategoryRepository repository) {
-        repository.saveAll(categoryMap.values()).collectList().block();
+    public Flux<Category> insertCategories(CategoryRepository repository) {
+        return repository.saveAll(categoryMap.values());
     }
 
-    public void insertBooks(BookRepository repository) {
-        List<Book> books = getBookList();
-        List<Book> block = repository.saveAll(books).collectList().block();
-        bookList.addAll(Objects.requireNonNull(block));
+    public Flux<Book> insertBooks(BookRepository repository) {
+        return repository.saveAll(getBookList());
     }
 
-    public void insertComments(CommentRepository repository) {
-        List<Comment> comments = getCommentList(bookList);
-        repository.saveAll(comments).collectList().block();
+    public Flux<Comment> insertComments(CommentRepository repository, List<Book> books) {
+        return repository.saveAll(getCommentList(books));
     }
 
     private List<Book> getBookList() {

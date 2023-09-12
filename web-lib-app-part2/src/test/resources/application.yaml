@@ -18,7 +18,6 @@ mongock:
         false
     read-concern: local
 
-
 logging:
   level:
     root: ERROR
