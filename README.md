@@ -11,3 +11,4 @@
 8) library-app-part4 Библеотека на MongoDB
 9) web-library-app Web-приложение Библеотека
 10) web-library-app2 AJAX/SPA-приложение Библеотека
+11) web-flux приложение на реактивном стеке Spring
