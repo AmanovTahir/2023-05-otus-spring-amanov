@@ -9,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
@@ -21,7 +20,9 @@ import ru.otus.library.domain.Comment;
 import ru.otus.library.dto.AuthorDto;
 import ru.otus.library.dto.BookDto;
 import ru.otus.library.dto.CategoryDto;
+import ru.otus.library.repositories.AuthorRepository;
 import ru.otus.library.repositories.BookRepository;
+import ru.otus.library.repositories.CategoryRepository;
 import ru.otus.library.repositories.CommentRepository;
 
 import java.time.Duration;
@@ -34,7 +35,6 @@ import static org.mockito.Mockito.when;
 
 
 @DisplayName("BookController должен")
-@TestPropertySource(properties = "mongock.enabled=false")
 @WebFluxTest(BookController.class)
 @ComponentScan("ru.otus.library.mapper")
 class BookControllerTest {
@@ -46,6 +46,10 @@ class BookControllerTest {
     private BookRepository bookRepository;
     @MockBean
     private CommentRepository commentRepository;
+    @MockBean
+    private AuthorRepository authorRepository;
+    @MockBean
+    private CategoryRepository categoryRepository;
 
     @BeforeEach
     void setUp() {
@@ -114,11 +118,18 @@ class BookControllerTest {
     @Test
     public void shouldSaveBook() {
         //given
+        String categoryId = "categoryId";
+        String authorId = "authorId";
         BookDto bookDto = new BookDto("new book", Collections.emptyList(), Collections.emptyList());
         Book book = new Book("new book", Collections.emptyList(), Collections.emptyList());
+        Category category = new Category(categoryId, "category");
+        Author author = new Author(authorId, "first_name", "last_name");
 
         var client = webClient.mutate().responseTimeout(Duration.ofSeconds(20)).build();
 
+        when(authorRepository.findAllById(List.of(authorId))).thenReturn(Flux.just(author));
+        when(categoryRepository.findAllById(List.of(categoryId))).thenReturn(Flux.just(category));
+        when(commentRepository.addBookToComments(any())).thenReturn(Mono.when());
         when(bookRepository.save(any())).thenReturn(Mono.just(book));
 
         //when
@@ -139,9 +150,11 @@ class BookControllerTest {
     public void shouldDeleteBook() {
         //given
         String bookId = "bookId";
+        String commentId = "commentId";
         Book book = new Book("new book", Collections.emptyList(), Collections.emptyList());
 
         when(bookRepository.findById(bookId)).thenReturn(Mono.just(book));
+        when(commentRepository.deleteAllBookById(bookId)).thenReturn(Mono.when());
         when(bookRepository.deleteById(bookId)).thenReturn(Mono.when());
 
         var client = webClient.mutate().responseTimeout(Duration.ofSeconds(20)).build();
@@ -165,11 +178,18 @@ class BookControllerTest {
         var book = new Book(bookId, "new book",
                 List.of(new Author("id", "firstName", "lastName")),
                 List.of(new Category("id", "category")));
+        String categoryId = "categoryId";
+        String authorId = "authorId";
+        Category category = new Category(categoryId, "category");
+        Author author = new Author(authorId, "first_name", "last_name");
 
+        when(bookRepository.findById(bookId)).thenReturn(Mono.just(book));
+        when(authorRepository.findAllById(any(Mono.class))).thenReturn(Flux.just(author));
+        when(categoryRepository.findAllById(any(Mono.class))).thenReturn(Flux.just(category));
+        when(commentRepository.addBookToComments(any())).thenReturn(Mono.when());
         when(bookRepository.save(any(Book.class))).thenReturn(Mono.just(book));
 
         var client = webClient.mutate().responseTimeout(Duration.ofSeconds(20)).build();
-
 
         //when
         client.put()
