@@ -76,8 +76,7 @@ public class BookController {
         log.debug("REST requesting delete book by id: {}", id);
         return bookRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Book with id: " + id + " not found")))
-                .flatMap(book -> commentRepository.findAllByBookId(id)
-                        .flatMap(commentRepository::delete)
+                .flatMap(book -> commentRepository.deleteAllBookById(id)
                         .then(bookRepository.deleteById(id)))
                 .then();
     }
@@ -94,13 +93,19 @@ public class BookController {
         List<String> categoryIds = dto.getCategories().stream().map(CategoryDto::getId).toList();
         List<String> authorsIds = dto.getAuthors().stream().map(AuthorDto::getId).toList();
 
-        return Flux.fromIterable(authorsIds)
+        Flux<Author> authorsFlux = Flux.fromIterable(authorsIds)
                 .flatMap(authorId -> authorRepository.findAllById(Mono.just(authorId)))
                 .collectList()
-                .flatMap(authors -> Flux.fromIterable(categoryIds)
-                        .flatMap(categoryId -> categoryRepository.findAllById(Mono.just(categoryId)))
-                        .collectList()
-                        .flatMap(categories -> saveBook(dto, authors, categories)));
+                .flatMapMany(Flux::fromIterable);
+
+        Flux<Category> categoriesFlux = Flux.fromIterable(categoryIds)
+                .flatMap(categoryId -> categoryRepository.findAllById(Mono.just(categoryId)))
+                .collectList()
+                .flatMapMany(Flux::fromIterable);
+
+        return Flux.zip(authorsFlux.collectList(), categoriesFlux.collectList())
+                .flatMap(tuple -> saveBook(dto, tuple.getT1(),  tuple.getT2()))
+                .next();
     }
 
     private Mono<BookDto> saveBook(BookDto dto, List<Author> authors, List<Category> categories) {
@@ -108,11 +113,7 @@ public class BookController {
         book.setAuthors(authors);
         book.setCategories(categories);
 
-        return commentRepository.findAllByBookId(dto.getId())
-                .flatMap(comment -> {
-                    comment.setBook(book);
-                    return commentRepository.save(comment);
-                })
+        return commentRepository.addBookToComments(book)
                 .then(bookRepository.save(book).map(bookMapper::toDto));
     }
 }
