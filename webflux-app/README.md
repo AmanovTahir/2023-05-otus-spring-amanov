@@ -1,11 +1,11 @@
 # Домашнее задание
 
-Приложение с использованием AJAX и REST-контроллеров
+Использовать WebFlux
 
 ## Цель:
 
-Использовать Spring MVC для разработки современных AJAX/SPA приложений c помощью Spring MVC
+разрабатывать Responsive и Resilent приложения на реактивном стеке Spring c помощью Spring Web Flux и Reactive Spring Data Repositories
 
 ## Результат:
 
-Современное приложение на стеке Spring
+приложение на реактивном стеке Spring
