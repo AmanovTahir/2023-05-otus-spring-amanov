@@ -1,0 +1,16 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: library
+
+mongock:
+  enabled: true
+
+logging:
+  level:
+    ru.otus.library: debug
+
+server:
+  port: 8000

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .books {
+            border: 1px solid steelblue;
+            width: 400px;
+            border-collapse: collapse;
+        }
+
+        .books tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .books td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+<h1>Books:</h1>
+
+<a href="/add">Add new</a>
+<table class="books">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Authors</th>
+        <th>Categories</th>
+        <th>Delete</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody id="bookListBody">
+    </tbody>
+</table>
+
+<script>
+    const bookListBody = document.getElementById("bookListBody");
+
+    function fetchBooks() {
+        fetch('/api/book')
+            .then(response => response.json())
+            .then(displayBooks)
+            .catch(error => console.error("Error:", error));
+    }
+
+    function displayBooks(books) {
+        bookListBody.innerHTML = "";
+
+        books.forEach(book => {
+            const authors = book.authors.map(author => author.firstName + ' ' + author.lastName).join(", ");
+            const categories = book.categories.map(category => category.name).join(", ");
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${book.id}</td>
+                <td><a href=/${book.id}>${book.title}</a></td>
+                <td>${authors}</td>
+                <td>${categories}</td>
+                <td><button class="deleteBookButton" data-book-id="${book.id}">Delete</button></td>
+                <td><button class="editBookButton" data-book-id="${book.id}">Edit</button></td>
+            `;
+            bookListBody.appendChild(row);
+        });
+
+        const deleteBookButtons = document.querySelectorAll(".deleteBookButton");
+        deleteBookButtons.forEach(button => {
+            button.addEventListener("click", deleteBook);
+        });
+
+        const editBookButtons = document.querySelectorAll(".editBookButton");
+        editBookButtons.forEach(button => {
+            button.addEventListener("click", editBook);
+        });
+    }
+
+    function deleteBook(event) {
+        const bookId = event.target.getAttribute("data-book-id");
+        fetch(`/api/book/${bookId}`, {
+            method: "DELETE"
+        })
+            .then(() => {
+                fetchBooks();
+            });
+    }
+
+    function editBook(event) {
+        const bookId = event.target.getAttribute("data-book-id");
+        location.href = `/edit/${bookId}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchBooks);
+</script>
+</body>
+</html>
