@@ -81,6 +81,14 @@ VALUES (1, 'Увлекательная научная фантастика, чи
        (10, 'Марина Иванова - поэт с большой буквы, её стихи умиротворяют и вдохновляют.');
 
 
-INSERT INTO users (login, password, role)
-values ('admin', '1', 'ADMIN'),
-       ('user', '1', 'USER');
+INSERT INTO users (login, password)
+values ('admin', '1'),
+       ('user', '1');
+
+INSERT INTO roles (name)
+VALUES ('ROLE_ADMIN'),
+       ('ROLE_USER');
+
+INSERT INTO user_roles (user_id, role_id)
+VALUES (1, 1),
+       (2, 2);

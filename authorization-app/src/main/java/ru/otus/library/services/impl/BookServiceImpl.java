@@ -1,6 +1,7 @@
 package ru.otus.library.services.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.library.domain.Book;
@@ -17,6 +18,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteById(Long id) {
         bookRepository.deleteById(id);
     }
@@ -35,12 +37,14 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public Book update(Book book) {
         return bookRepository.save(book);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public Book insert(Book book) {
         return bookRepository.save(book);
     }

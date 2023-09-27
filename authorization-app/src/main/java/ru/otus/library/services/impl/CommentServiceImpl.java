@@ -36,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(hasRole('ADMIN'))")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteByBookId(Long bookId) {
         repository.deleteAllByBook_Id(bookId);
     }

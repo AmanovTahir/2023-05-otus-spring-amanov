@@ -9,6 +9,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.security.config.http.SessionCreationPolicy.ALWAYS;
+
 @Configuration
 public class SecurityConfig {
 
@@ -16,9 +19,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(ALWAYS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/**").hasAnyRole("ADMIN")
+                        .requestMatchers(GET, "/api/book/*", "/*").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/**").hasRole("ADMIN")
                         .anyRequest().denyAll()
                 )
                 .formLogin(Customizer.withDefaults());
