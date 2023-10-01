@@ -11,4 +11,7 @@
 8) library-app-part4 Библеотека на MongoDB
 9) web-library-app Web-приложение Библеотека
 10) web-library-app2 AJAX/SPA-приложение Библеотека
-11) web-flux приложение на реактивном стеке Spring
+11) web-flux Приложение на реактивном стеке Spring
+12) security-app Механизмы аутентификации
+13) authorization-app Приложение с безопасностью на основе Spring Security
+14) data-migrate-app Приложение для пакетных обработок данных на Spring Batch
