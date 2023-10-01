@@ -33,7 +33,7 @@ public class SqlMovie {
     @Column(name = "release_year")
     private Integer releaseYear;
 
-    @Fetch(FetchMode.SELECT)
+    @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "movie_genre",
@@ -42,7 +42,7 @@ public class SqlMovie {
     )
     private List<SqlGenre> genres;
 
-    @Fetch(FetchMode.SELECT)
+    @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "movie_actor",
