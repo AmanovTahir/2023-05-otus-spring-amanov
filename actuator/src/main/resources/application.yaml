@@ -1,0 +1,45 @@
+spring:
+  data:
+    mongodb:
+      database: library
+      host: localhost
+      port: 27017
+    rest:
+      basePath: /datarest/api
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+mongock:
+  change-logs-scan-package:
+    - ru.otus.library.changelog
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local
+
+logging:
+  file:
+    name: ./logs/library-log.log
+  level:
+    ru.otus.library: debug
+
+management:
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: metrics,health,logfile
+    jackson:
+      isolated-object-mapper: false
+  endpoint:
+    health:
+      show-details: always
+    logfile:
+      external-file: ${logging.file.name}
+  health:
+    defaults:
+      enabled: true
+
+
+server:
+  port: 8000
