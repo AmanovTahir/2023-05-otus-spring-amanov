@@ -1,0 +1,19 @@
+version: '3'
+services:
+  library-app:
+    container_name: library
+    image: library:1.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - library-db
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://library-db:27017/library
+  library-db:
+    container_name: library-db
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"

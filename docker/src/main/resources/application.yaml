@@ -1,0 +1,41 @@
+spring:
+  data:
+    mongodb:
+      database: library
+      host: localhost
+      port: 27017
+    rest:
+      basePath: /datarest/api
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+mongock:
+  change-logs-scan-package:
+    - ru.otus.library.changelog
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local
+
+logging:
+  level:
+    root: info
+    org.springframework.data.mongodb.core: debug
+
+management:
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: metrics,health
+    jackson:
+      isolated-object-mapper: false
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
+
+server:
+  port: 8080
