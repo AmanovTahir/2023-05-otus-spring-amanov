@@ -15,3 +15,6 @@
 12) security-app Механизмы аутентификации
 13) authorization-app Приложение с безопасностью на основе Spring Security
 14) data-migrate-app Приложение для пакетных обработок данных на Spring Batch
+15) dungeons Приложение c применением EIP на Spring Integration
+16) actuator Приложение с применением Spring Boot Actuator
+17) docker Обёртка приложения в Docker
