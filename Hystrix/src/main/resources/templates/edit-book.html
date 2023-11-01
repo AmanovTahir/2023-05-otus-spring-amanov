@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Book</title>
+    <script th:inline="javascript">
+        const bookId = /*[[${bookId}]]*/ null;
+    </script>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        select[multiple] {
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+<h1>Edit Book</h1>
+
+<form id="formElem">
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" placeholder="Book Title">
+    </div>
+    <div>
+        <label for="author">Authors:</label>
+        <select id="author" name="author" multiple>
+        </select>
+    </div>
+    <div>
+        <label for="category">Categories:</label>
+        <select id="category" name="category" multiple>
+        </select>
+    </div>
+    <div>
+        <button type="submit">Save Changes</button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const formElem = document.getElementById("formElem");
+
+        function editBook(bookId, formData) {
+            fetch(`/api/book/${bookId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            }).then(response => {
+                if (response.ok) {
+                    location.href = "/";
+                } else {
+                    console.error("Error:", response.statusText);
+                }
+            }).catch(error => {
+                console.error("Error:", error);
+            });
+        }
+
+        function bookData(bookId) {
+            return fetch(`/api/book/${bookId}`)
+                .then(response => response.json());
+        }
+
+        function authors() {
+            return fetch('/api/author/')
+                .then(response => response.json());
+        }
+
+        function categories() {
+            return fetch('/api/category/')
+                .then(response => response.json());
+        }
+
+        function populateDropdown(selectElem, data, selectedIds) {
+            data.forEach(item => {
+                const option = document.createElement("option");
+                option.value = JSON.stringify(item);
+                option.textContent = item.name || (item.firstName + " " + item.lastName);
+                option.selected = selectedIds.includes(item.id);
+                selectElem.appendChild(option);
+            });
+        }
+
+        formElem.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const formData = {
+                id: bookId,
+                title: formElem.querySelector('input[name="title"]').value,
+                authors: Array.from(formElem.querySelectorAll('select[name="author"] option:checked')).map(option => JSON.parse(option.value)),
+                categories: Array.from(formElem.querySelectorAll('select[name="category"] option:checked')).map(option => JSON.parse(option.value))
+            };
+
+            editBook(bookId, formData);
+        });
+
+        Promise.all([
+            bookData(bookId),
+            authors(),
+            categories()
+        ]).then(([bookData, authors, categories]) => {
+            document.getElementById('title').value = bookData.title;
+
+            const selectedAuthors = bookData.authors.map(author => author.id);
+            const selectedCategories = bookData.categories.map(category => category.id);
+
+            populateDropdown(document.getElementById("author"), authors, selectedAuthors);
+            populateDropdown(document.getElementById("category"), categories, selectedCategories);
+        }).catch(error => {
+            console.error("Error:", error);
+        });
+    });
+</script>
+</body>
+</html>

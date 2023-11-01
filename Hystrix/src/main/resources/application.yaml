@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: library-app
+  profiles:
+    include:
+      - db
+      - actuator
+      - log
+      - circuitbreaker
+      - logging
+server:
+  port: 8080

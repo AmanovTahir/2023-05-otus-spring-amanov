@@ -1,0 +1,24 @@
+spring:
+  config:
+    activate:
+      on-profile: circuitbreaker
+resilience4j.circuitbreaker:
+  metrics:
+    enabled: true
+  configs:
+    default:
+      registerHealthIndicator: true
+      allowHealthIndicatorToFail: true
+      minimumNumberOfCalls: 10
+      slidingWindowType: COUNT_BASED
+      slidingWindowSize: 3
+      failureRateThreshold: 60
+      slowCallDurationThreshold: 3000
+      slowCallRateThreshold: 90
+      permittedNumberOfCallsInHalfOpenState: 5
+      waitDurationInOpenState: 3000
+  instances:
+    fallback:
+      baseConfig: default
+      ignoreExceptions:
+        - ru.otus.library.exceptions.BookNotFoundException

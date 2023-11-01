@@ -1,0 +1,19 @@
+spring:
+  config:
+    activate:
+      on-profile: db
+  data:
+    mongodb:
+      database: library
+      host: localhost
+      port: 27017
+    rest:
+      basePath: /datarest/api
+
+mongock:
+  change-logs-scan-package:
+    - ru.otus.library.changelog
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local

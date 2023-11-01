@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        select[multiple] {
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+<h1>Add Book</h1>
+
+<form id="formElem">
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" placeholder="Book Title" required>
+    </div>
+    <div>
+        <label for="author">Authors:</label>
+        <select id="author" name="author" multiple>
+        </select>
+    </div>
+    <div>
+        <label for="category">Categories:</label>
+        <select id="category" name="category" multiple>
+        </select>
+    </div>
+    <div>
+        <button type="submit">Add Book</button>
+        <a href="/">
+            <button type="button">Go Back</button>
+        </a>
+    </div>
+</form>
+
+<script>
+    function addBook(formData) {
+        fetch('/api/book/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        }).then(rawResponse => {
+            if (rawResponse.ok) {
+                location.href = '/';
+            } else {
+                console.error("Error:", rawResponse.statusText);
+            }
+        }).catch(error => {
+            console.error("Error:", error);
+        });
+    }
+
+    function initializeForm() {
+        fetch('/api/author/')
+            .then(response => response.json())
+            .then(authors => {
+                const authorSelect = document.getElementById('author');
+                authors.forEach(author => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(author);
+                    option.textContent = author.firstName + ' ' + author.lastName;
+                    authorSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+
+        fetch('/api/category/')
+            .then(response => response.json())
+            .then(categories => {
+                const categorySelect = document.getElementById('category');
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(category);
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        initializeForm();
+
+        const formElem = document.getElementById("formElem");
+        formElem.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const titleInput = formElem.querySelector('input[name="title"]');
+            const authorSelect = formElem.querySelector('select[name="author"]');
+            const categorySelect = formElem.querySelector('select[name="category"]');
+
+            if (titleInput.value.trim() === "") {
+                alert("Title is required.");
+                return;
+            }
+
+            const selectedAuthors = Array.from(authorSelect.selectedOptions, option => JSON.parse(option.value));
+
+            const selectedCategories = Array.from(categorySelect.selectedOptions, option => JSON.parse(option.value));
+
+            if (selectedAuthors.length === 0) {
+                alert("At least one author must be selected.");
+                return;
+            }
+
+            if (selectedCategories.length === 0) {
+                alert("At least one category must be selected.");
+                return;
+            }
+
+            const formData = {
+                title: titleInput.value,
+                authors: selectedAuthors,
+                categories: selectedCategories
+            };
+
+            addBook(formData);
+        });
+    });
+</script>
+</body>
+</html>
