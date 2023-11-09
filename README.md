@@ -18,3 +18,4 @@
 15) dungeons Приложение c применением EIP на Spring Integration
 16) actuator Приложение с применением Spring Boot Actuator
 17) docker Обёртка приложения в Docker
+18) circuitbreaker Обернуть внешние вызовы в Hystrix
