@@ -30,7 +30,6 @@ public class BookServiceImpl implements BookService {
         bookRepository.deleteById(id);
     }
 
-    @SneakyThrows
     @Override
     @Transactional(readOnly = true)
     @CircuitBreaker(name = "bookServiceCircuitBreaker", fallbackMethod = "getAllBookFallback")
