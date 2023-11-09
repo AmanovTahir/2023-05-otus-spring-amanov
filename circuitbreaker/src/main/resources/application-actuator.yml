@@ -1,0 +1,25 @@
+spring:
+  config:
+    activate:
+      on-profile: actuator
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+management:
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: '*'
+    jackson:
+      isolated-object-mapper: false
+  endpoint:
+    health:
+      show-details: always
+    circuitbreakers:
+      enabled: true
+    logfile:
+      external-file: ${logging.file.name}
+  health:
+    defaults:
+      enabled: true

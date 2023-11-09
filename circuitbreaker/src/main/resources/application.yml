@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: library-app
+  config:
+    import:
+      - application-actuator.yml
+      - application-circuit-breaker.yml
+      - application-db.yml
+      - application-logging.yml
+      - application-changelog.yml
+server:
+  port: 8080

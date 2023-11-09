@@ -1,0 +1,13 @@
+spring:
+  config:
+    activate:
+      on-profile: logging
+logging:
+  file:
+    name: ./logs/library-log.log
+  level:
+    root: info
+    org.springframework.data.mongodb.core: error
+    io:
+      github:
+        resilience4j: DEBUG
